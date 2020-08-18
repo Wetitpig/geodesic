@@ -1,66 +1,78 @@
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #define RADIUS 6371.0088
 #define RAD M_PI / 180
 
-static inline int valid(double lat, double lon)
+struct Coordinates {
+	double lat;
+	double lon;
+	int fail;
+};
+
+static inline void outrange(struct Coordinates loc)
 {
-	return lat < -90 || lat > 90 || lon < -180 || lon > 180;
+	if (loc.lat < -90 || loc.lat > 90 || loc.lon < -180 || loc.lon > 180) {
+		printf("Coordinate %lf,%lf out of range.\nAbort.\n", loc.lat, loc.lon);
+		exit(1);
+	}
 }
 
-
-static inline void outrange(double lat, double lon)
+static inline struct Coordinates scan(int argc, char *argv)
 {
-	printf("Coordinate %lf,%lf out of range.\nAbort.\n", lat, lon);
-	return;
+	struct Coordinates loc;
+	int count;
+	if (argc == 1)
+		loc.fail = scanf("%lf,%lf", &loc.lat, &loc.lon);
+	else
+		sscanf(argv, "%lf,%lf", &loc.lat, &loc.lon);
+	return loc;
 }
 
 int main(int argc, char **argv)
 {
-	if (argc < 3) {
+	if (argc == 2) {
 		printf("Usage:\n\t%s [coordinate 1] [coordinate 2] ...\n", argv[0]);
 		return 1;
 	}
 
-	double lat[2], lon[2];
+	struct Coordinates location0, location1;
 	double latdiff, londiff, a, b, c, total = 0;
-	int i;
+	int i, j;
 
-	sscanf(argv[1], "%lf,%lf", &lat[0], &lon[0]);
-	if (valid(lat[0], lon[0])) {
-		outrange(lat[0], lon[0]);
-		return 1;
-	}
-	lat[0] *= RAD;
-	lon[0] *= RAD;
+	location0 = scan(argc, argv[1]);
+	outrange(location0);
+
+	location0.lat *= RAD;
+	location0.lon *= RAD;
 
 	puts("{");
 
-	for (i = 2; i < argc; ++i) {
-		sscanf(argv[i], "%lf,%lf", &lat[1], &lon[1]);
-		if (valid(lat[1], lon[1])) {
-			outrange(lat[1], lon[1]);
-			return 1;
-		}
+	for (i = 2; (argc > 1 && i < argc) || argc == 1; ++i) {
+		location1 = scan(argc, argv[i]);
+		outrange(location1);
 
-		lat[1] *= RAD;
-		lon[1] *= RAD;
+		if (location1.fail == -1)
+			break;
 
-		latdiff = lat[1] - lat[0];
-		londiff = lon[1] - lon[0];
+		location1.lat *= RAD;
+		location1.lon *= RAD;
+
+		latdiff = location1.lat - location0.lat;
+		londiff = location1.lon - location0.lon;
 
 		a = sin(latdiff / 2);
 		b = sin(londiff / 2);
 		a *= a;
-		a += cos(lat[1]) * cos(lat[0]) * b * b;
+		a += cos(location1.lat) * cos(location0.lat) * b * b;
 		c = 2 * atan2(sqrt(a), sqrt(1-a));
 		c *= RADIUS;
 
 		total += c;
 
-		lat[0] = lat[1];
-		lon[0] = lon[1];
+		location0.lat = location1.lat;
+		location0.lon = location1.lon;
 
 		printf("  \"%d\": %lf,\n", i - 1, c);
 	}
