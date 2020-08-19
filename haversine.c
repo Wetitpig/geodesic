@@ -44,7 +44,7 @@ int main(int argc, char **argv)
 
 	puts("{");
 
-	for (i = 2; (argc > 1 && i < argc) || argc == 1; ++i) {
+	for (i = 2; i < argc || argc == 1; ++i) {
 		if (scan(argc, argv[i], location1) == -1)
 			break;
 		if (location1->lat < -90 || location1->lat > 90 || location1->lon < -180 || location1->lon > 180) {
