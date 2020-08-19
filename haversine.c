@@ -10,15 +10,7 @@ struct Coordinates {
 	double lon;
 };
 
-static inline void outrange(struct Coordinates *loc)
-{
-	if (loc->lat < -90 || loc->lat > 90 || loc->lon < -180 || loc->lon > 180) {
-		printf("Coordinate %lf,%lf out of range.\nAbort.\n", loc->lat, loc->lon);
-		exit(1);
-	}
-}
-
-static inline int scan(int argc, char *argv, struct Coordinates *loc)
+int scan(int argc, char *argv, struct Coordinates *loc)
 {
 	int count = 0;
 	if (argc == 1)
@@ -42,7 +34,10 @@ int main(int argc, char **argv)
 	int i, j;
 
 	scan(argc, argv[1], location0);
-	outrange(location0);
+	if (location0->lat < -90 || location0->lat > 90 || location0->lon < -180 || location0->lon > 180) {
+		printf("Coordinate %lf,%lf out of range.\nAbort.\n", location0->lat, location0->lon);
+		goto freeing;
+	}
 
 	location0->lat *= RAD;
 	location0->lon *= RAD;
@@ -52,7 +47,10 @@ int main(int argc, char **argv)
 	for (i = 2; (argc > 1 && i < argc) || argc == 1; ++i) {
 		if (scan(argc, argv[i], location1) == -1)
 			break;
-		outrange(location1);
+		if (location1->lat < -90 || location1->lat > 90 || location1->lon < -180 || location1->lon > 180) {
+			printf("Coordinate %lf,%lf out of range.\nAbort.\n", location1->lat, location1->lon);
+			goto freeing;
+		}
 
 		location1->lat *= RAD;
 		location1->lon *= RAD;
@@ -81,4 +79,8 @@ int main(int argc, char **argv)
 	printf("  \"total_distance\": %lf\n}\n", total);
 
 	return 0;
+freeing:
+	free(location0);
+	free(location1);
+	return 1;
 }
