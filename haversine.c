@@ -61,8 +61,7 @@ int main(int argc, char **argv)
 		b = sin(londiff / 2);
 		a *= a;
 		a += cos((location + 1)->lat) * cos(location->lat) * b * b;
-		c = 2 * atan2(sqrt(a), sqrt(1-a));
-		c *= RADIUS;
+		c = 2 * atan2(sqrt(a), sqrt(1-a)) * RADIUS;
 
 		total += c;
 		memcpy(location, location + 1, sizeof(struct Coordinates));
