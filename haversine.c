@@ -27,60 +27,55 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	struct Coordinates *location0 = malloc(sizeof(struct Coordinates));
-	struct Coordinates *location1 = malloc(sizeof(struct Coordinates));
+	struct Coordinates *location = malloc(sizeof(struct Coordinates) * 2);
 
 	double latdiff, londiff, a, b, c, total = 0;
 	int i, j;
 
-	scan(argc, argv[1], location0);
-	if (location0->lat < -90 || location0->lat > 90 || location0->lon < -180 || location0->lon > 180) {
-		printf("Coordinate %lf,%lf out of range.\nAbort.\n", location0->lat, location0->lon);
+	scan(argc, argv[1], location);
+	if (location->lat < -90 || location->lat > 90 || location->lon < -180 || location->lon > 180) {
+		printf("Coordinate %lf,%lf out of range.\nAbort.\n", location->lat, location->lon);
 		goto freeing;
 	}
 
-	location0->lat *= RAD;
-	location0->lon *= RAD;
+	location->lat *= RAD;
+	location->lon *= RAD;
 
 	puts("{");
 
 	for (i = 2; i < argc || argc == 1; ++i) {
-		if (scan(argc, argv[i], location1) == -1)
+		if (scan(argc, argv[i], (location + 1)) == -1)
 			break;
-		if (location1->lat < -90 || location1->lat > 90 || location1->lon < -180 || location1->lon > 180) {
-			printf("Coordinate %lf,%lf out of range.\nAbort.\n", location1->lat, location1->lon);
+		if ((location + 1)->lat < -90 || (location + 1)->lat > 90 || (location + 1)->lon < -180 || (location + 1)->lon > 180) {
+			printf("Coordinate %lf,%lf out of range.\nAbort.\n", (location + 1)->lat, (location + 1)->lon);
 			goto freeing;
 		}
 
-		location1->lat *= RAD;
-		location1->lon *= RAD;
+		(location + 1)->lat *= RAD;
+		(location + 1)->lon *= RAD;
 
-		latdiff = location1->lat - location0->lat;
-		londiff = location1->lon - location0->lon;
+		latdiff = (location + 1)->lat - location->lat;
+		londiff = (location + 1)->lon - location->lon;
 
 		a = sin(latdiff / 2);
 		b = sin(londiff / 2);
 		a *= a;
-		a += cos(location1->lat) * cos(location0->lat) * b * b;
+		a += cos((location + 1)->lat) * cos(location->lat) * b * b;
 		c = 2 * atan2(sqrt(a), sqrt(1-a));
 		c *= RADIUS;
 
 		total += c;
-
-		location0->lat = location1->lat;
-		location0->lon = location1->lon;
+		memcpy(location, location + 1, sizeof(struct Coordinates));
 
 		printf("  \"%d\": %lf,\n", i - 1, c);
 	}
 
-	free(location0);
-	free(location1);
+	free(location);
 
 	printf("  \"total_distance\": %lf\n}\n", total);
 
 	return 0;
 freeing:
-	free(location0);
-	free(location1);
+	free(location);
 	return 1;
 }
