@@ -1,5 +1,9 @@
-# Haversine
+# Geodesic
 A program for calculating distance between coordinates.
+
+## Formulae
+* [Haversine formula](https://en.wikipedia.org/wiki/Haversine_formula)
+* [incenty formula](https://en.wikipedia.org/wiki/Vincenty%27s_formulae)
 
 # Compilation
 * `gcc -o haversine haversine.c -lm`
@@ -10,7 +14,7 @@ Coordinates can be inputted from both command line and standard input (stdin).
 
 ## Format of coordinates
 `[coordinates1] [coordinates2] ... [coordinatesN]`, where
-each coordinate is in the form of `latitude,longitude`
+each coordinate is in the form of `latitude,longitude` in decimals.
 
 For latitudes, positive is assumed for north.
 For longitudes, positive is assumed for east.
@@ -29,6 +33,6 @@ Output is in JSON format:
 Where
 each numbered pair specifies the distance between the nth point and (n+1)th point.
  
-`"total"` specifies the total distance of the line joining all points.
+`"total_distance"` specifies the total distance of the line joining all points.
  
 All distances are provided in kilometres.
