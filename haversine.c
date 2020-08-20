@@ -1,24 +1,9 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "constants.h"
 
-#define RADIUS 6371.0088
-#define RAD M_PI / 180
-
-struct Coordinates {
-	double lat;
-	double lon;
-};
-
-int scan(int argc, char *argv, struct Coordinates *loc)
-{
-	int count = 0;
-	if (argc == 1)
-		count = scanf("%lf,%lf", &loc->lat, &loc->lon);
-	else
-		sscanf(argv, "%lf,%lf", &loc->lat, &loc->lon);
-	return count;
-}
+#include "functions.h"
 
 int main(int argc, char **argv)
 {
