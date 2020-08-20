@@ -13,14 +13,14 @@ int main(int argc, char **argv)
 	}
 
 	struct Coordinates *location = malloc(sizeof(struct Coordinates) * 2);
-	double londiff, lambda, oldlambda, u1, u2;
-	double ssig, csig, sig, salp, calp, cos2, C;
-	double usq, a, b, dsig, s;
-	double total = 0;
+	long double londiff, lambda, oldlambda, u1, u2;
+	long double ssig, csig, sig, salp, calp, cos2, C;
+	long double usq, k1, a, b, dsig, s;
+	long double total = 0;
 
 	scan(argc, argv[1], location);
 	if (location->lat < -90 || location->lat > 90 || location->lon < -180 || location->lon > 180) {
-		printf("Coordinate %lf,%lf out of range.\nAbort.\n", location->lat, location->lon);
+		printf("Coordinate %Lf,%Lf out of range.\nAbort.\n", location->lat, location->lon);
 		goto freeing;
 	}
 
@@ -33,7 +33,7 @@ int main(int argc, char **argv)
 		if (scan(argc, argv[i], (location + 1)) == -1)
 			break;
 		if ((location + 1)->lat < -90 || (location + 1)->lat > 90 || (location + 1)->lon < -180 || (location + 1)->lon > 180) {
-			printf("Coordinate %lf,%lf out of range.\nAbort.\n", (location + 1)->lat, (location + 1)->lon);
+			printf("Coordinate %Lf,%Lf out of range.\nAbort.\n", (location + 1)->lat, (location + 1)->lon);
 			goto freeing;
 		}
 
@@ -42,44 +42,46 @@ int main(int argc, char **argv)
 
 		londiff = (location + 1)->lon - location->lon;
 		lambda = londiff;
-		u1 = atan((1 - FLATTENING) * tan(location->lat));
-		u2 = atan((1 - FLATTENING) * tan((location + 1)->lat));
+		u1 = atanl((1 - FLAT) * tanl(location->lat));
+		u2 = atanl((1 - FLAT) * tanl((location + 1)->lat));
 
 		do {
 			oldlambda = lambda;
 
-			ssig = cos(u2) * sin(lambda);
-			csig = cos(u1) * sin(u2) - sin(u1) * cos(u2) * cos(lambda);
+			ssig = cosl(u2) * sinl(lambda);
+			csig = cosl(u1) * sinl(u2) - sinl(u1) * cosl(u2) * cosl(lambda);
 			ssig *= ssig;
 			csig *= csig;
-			ssig = sqrt(ssig + csig);
+			ssig = sqrtl(ssig + csig);
 
-			csig = sin(u1) * sin(u2) + cos(u1) * cos(u2) * cos(lambda);
+			csig = sinl(u1) * sinl(u2) + cosl(u1) * cosl(u2) * cosl(lambda);
 
-			sig = atan2(ssig, csig);
+			sig = atan2l(ssig, csig);
 
-			salp = cos(u1) * cos(u2) * sin(lambda) / ssig;
+			salp = cosl(u1) * cosl(u2) * sinl(lambda) / ssig;
 			calp = 1 - salp * salp;
-			cos2 = csig - 2 * sin(u1) * sin(u2) / calp;
+			cos2 = csig - 2 * sinl(u1) * sinl(u2) / calp;
 
-			C = FLATTENING / 16 * calp * (4 + FLATTENING * (4 - 3 * calp));
-			lambda = londiff + (1 - C) * FLATTENING * salp * (sig + C * ssig * (cos2 + C * csig * (2 * cos2 * cos2 - 1)));
-		} while (fabs(oldlambda - lambda) >= pow(10,-12));
+			C = FLAT / 16 * calp * (4 + FLAT * (4 - 3 * calp));
+			lambda = londiff + (1 - C) * FLAT * salp * (sig + C * ssig * (cos2 + C * csig * (2 * cos2 * cos2 - 1)));
+		} while (fabsl(oldlambda - lambda) >= powl(10,-12));
 
-		usq = calp * (RAD_MAJ * RAD_MAJ - RAD_MIN * RAD_MIN) / (RAD_MIN * RAD_MIN);
-		a = 1 + usq / 16384 * (4096 + usq * (-768 + usq * (320 - 175 * usq)));
-		b = usq / 1024 * (256 + usq * (-128 + usq * (74 - 47 * usq)));
+		usq = calp * (RAD_MAJ * RAD_MAJ / (RAD_MIN * RAD_MIN) - 1);
+		k1 = sqrt(1 + usq);
+		k1 = (k1 - 1) / (k1 + 1);
+		a = (1 + k1 * k1 / 4) / (1 - k1);
+		b = k1 * (1 - 3 / 8 * k1 * k1);
 
 		dsig = b * ssig * (cos2 + b / 4 * (csig * (2 * cos2 * cos2 - 1) - b / 6 * cos2 * (4 * ssig * ssig - 3) * (4 * cos2 * cos2 - 3)));
 		s = RAD_MIN * a * (sig - dsig);
 
 		total += s;
 		memcpy(location, location + 1, sizeof(struct Coordinates));
-		printf("  \"%d\": %lf,\n", i - 1, s);
+		printf("  \"%d\": %Lf,\n", i - 1, s);
 	}
 
 	free(location);
-	printf("  \"total_distance\": %lf\n}\n", total);
+	printf("  \"total_distance\": %Lf\n}\n", total);
 
 	return 0;
 

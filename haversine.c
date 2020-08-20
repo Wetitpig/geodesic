@@ -14,12 +14,12 @@ int main(int argc, char **argv)
 
 	struct Coordinates *location = malloc(sizeof(struct Coordinates) * 2);
 
-	double latdiff, londiff, a, b, c, total = 0;
+	long double latdiff, londiff, a, b, c, total = 0;
 	int i, j;
 
 	scan(argc, argv[1], location);
 	if (location->lat < -90 || location->lat > 90 || location->lon < -180 || location->lon > 180) {
-		printf("Coordinate %lf,%lf out of range.\nAbort.\n", location->lat, location->lon);
+		printf("Coordinate %Lf,%Lf out of range.\nAbort.\n", location->lat, location->lon);
 		goto freeing;
 	}
 
@@ -32,7 +32,7 @@ int main(int argc, char **argv)
 		if (scan(argc, argv[i], (location + 1)) == -1)
 			break;
 		if ((location + 1)->lat < -90 || (location + 1)->lat > 90 || (location + 1)->lon < -180 || (location + 1)->lon > 180) {
-			printf("Coordinate %lf,%lf out of range.\nAbort.\n", (location + 1)->lat, (location + 1)->lon);
+			printf("Coordinate %Lf,%Lf out of range.\nAbort.\n", (location + 1)->lat, (location + 1)->lon);
 			goto freeing;
 		}
 
@@ -51,12 +51,12 @@ int main(int argc, char **argv)
 		total += c;
 		memcpy(location, location + 1, sizeof(struct Coordinates));
 
-		printf("  \"%d\": %lf,\n", i - 1, c);
+		printf("  \"%d\": %Lf,\n", i - 1, c);
 	}
 
 	free(location);
 
-	printf("  \"total_distance\": %lf\n}\n", total);
+	printf("  \"total_distance\": %Lf\n}\n", total);
 
 	return 0;
 freeing:

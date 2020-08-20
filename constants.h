@@ -8,11 +8,11 @@
 #define RAD_MAJ 6378.137
 #define RAD_MIN 6356.752314245
 
-#define FLATTENING 1/298.257223563
+#define FLAT 1/298.257223563
 
 struct Coordinates {
-	double lat;
-	double lon;
+	long double lat;
+	long double lon;
 };
 
 #endif
