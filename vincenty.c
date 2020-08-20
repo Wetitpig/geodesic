@@ -77,7 +77,7 @@ int main(int argc, char **argv)
 
 		total += s;
 		memcpy(location, location + 1, sizeof(struct Coordinates));
-		printf("  \"%d\": %Lf,\n", i - 1, s);
+		printf("  \"%d\": %Lf,\n", i - 2, s);
 	}
 
 	free(location);

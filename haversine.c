@@ -51,7 +51,7 @@ int main(int argc, char **argv)
 		total += c;
 		memcpy(location, location + 1, sizeof(struct Coordinates));
 
-		printf("  \"%d\": %Lf,\n", i - 1, c);
+		printf("  \"%d\": %Lf,\n", i - 2, c);
 	}
 
 	free(location);

@@ -2,7 +2,8 @@
 A program for calculating distance between coordinates.
 
 # Compilation
-`gcc -o haversine haversine.c -lm`
+* `gcc -o haversine haversine.c -lm`
+* `gcc -o vincenty vincenty.c -lm`
 
 # Usage
 Coordinates can be inputted from both command line and standard input (stdin).
@@ -18,11 +19,11 @@ For longitudes, positive is assumed for east.
 Output is in JSON format:
 ```
 {
+  "0": xxx,
   "1": xxx,
-  "2": xxx,
   ...
   "N": xxx,
-  "total": xxx
+  "total_distance": xxx
 }
 ```
 Where
