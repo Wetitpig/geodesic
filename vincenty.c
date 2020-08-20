@@ -19,10 +19,6 @@ int main(int argc, char **argv)
 	long double total = 0;
 
 	scan(argc, argv[1], location);
-	if (location->lat < -90 || location->lat > 90 || location->lon < -180 || location->lon > 180) {
-		printf("Coordinate %Lf,%Lf out of range.\nAbort.\n", location->lat, location->lon);
-		goto freeing;
-	}
 
 	location->lat *= RAD;
 	location->lon *= RAD;
@@ -32,10 +28,6 @@ int main(int argc, char **argv)
 	for (int i = 2; i < argc || argc == 1; ++i) {
 		if (scan(argc, argv[i], (location + 1)) == -1)
 			break;
-		if ((location + 1)->lat < -90 || (location + 1)->lat > 90 || (location + 1)->lon < -180 || (location + 1)->lon > 180) {
-			printf("Coordinate %Lf,%Lf out of range.\nAbort.\n", (location + 1)->lat, (location + 1)->lon);
-			goto freeing;
-		}
 
 		(location + 1)->lat *= RAD;
 		(location + 1)->lon *= RAD;
@@ -84,8 +76,4 @@ int main(int argc, char **argv)
 	printf("  \"total_distance\": %Lf\n}\n", total);
 
 	return 0;
-
-freeing:
-	free(location);
-	return 1;
 }
