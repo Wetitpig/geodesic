@@ -5,10 +5,11 @@ int scan(int argc, char *argv, struct Coordinates *loc)
 		count = scanf("%Lf,%Lf", &loc->lat, &loc->lon);
 	else
 		sscanf(argv, "%Lf,%Lf", &loc->lat, &loc->lon);
-	return count;
 
 	if (loc->lat < -90 || loc->lat > 90 || loc->lon < -180 || loc->lon > 180) {
 		printf("Coordinate %Lf,%Lf out of range.\nAbort.\n", loc->lat, loc->lon);
 		exit(1);
         }
+
+	return count;
 }
