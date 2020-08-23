@@ -34,11 +34,10 @@ int main(int argc, char **argv)
 		latdiff = (location + 1)->lat - location->lat;
 		londiff = (location + 1)->lon - location->lon;
 
-		a = sin(latdiff / 2);
-		b = sin(londiff / 2);
-		a *= a;
-		a += cos((location + 1)->lat) * cos(location->lat) * b * b;
-		c = 2 * atan2(sqrt(a), sqrt(1-a)) * RADIUS;
+		a = sqr(sin(latdiff / 2));
+		b = sinl(londiff / 2);
+		a += cosl((location + 1)->lat) * cosl(location->lat) * sqr(b);
+		c = 2 * atan2l(sqrtl(a), sqrtl(1-a)) * RADIUS;
 
 		total += c;
 		memcpy(location, location + 1, sizeof(struct Coordinates));

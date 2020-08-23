@@ -13,3 +13,8 @@ int scan(int argc, char *argv, struct Coordinates *loc)
 
 	return count;
 }
+
+long double sqr(long double operand)
+{
+	return operand * operand;
+}
