@@ -49,6 +49,7 @@ each numbered pair specifies the following:
 * `end_azimuth` as the bearing at the (n+1)th point, on the line from the nth point to the (n+1)th point.
  
 `"total_distance"` specifies the total distance of the line joining all points.
- 
-All distances are provided in kilometres.
-All angles are provided in degrees.
+
+## Units
+* All distances are provided in kilometres.
+* All angles are provided in degrees.
