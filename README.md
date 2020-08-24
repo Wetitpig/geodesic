@@ -9,6 +9,8 @@ A program for calculating distance between coordinates.
 * All: `make`
 * haversine/vincenty: `make [haversine|vincenty]`
 
+All binaries will be located in `./bin` directory.
+
 # Usage
 Coordinates can be inputted from both command line and standard input (stdin).
 

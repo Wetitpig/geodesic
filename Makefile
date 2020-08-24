@@ -1,15 +1,17 @@
 CC=gcc
-CFLAGS=-O3
+CFLAGS=-O3 -Iinclude
 
 LDFLAGS=-lm
 
 all: haversine vincenty
 
 haversine:
-	$(CC) $(CFLAGS) -o haversine haversine.c math.c io.c $(LDFLAGS)
+	@mkdir -p bin
+	$(CC) $(CFLAGS) -o bin/haversine src/haversine.c src/math.c src/io.c $(LDFLAGS)
 
 vincenty:
-	$(CC) $(CFLAGS) -o vincenty vincenty.c math.c io.c $(LDFLAGS)
+	@mkdir -p bin
+	$(CC) $(CFLAGS) -o bin/vincenty src/vincenty.c src/math.c src/io.c $(LDFLAGS)
 
 clean:
-	rm -f haversine vincenty
+	rm -rf bin
