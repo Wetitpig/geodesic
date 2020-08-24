@@ -1,9 +1,9 @@
 # Geodesic
-A program for calculating distance between coordinates.
+Programs for calculating distance between coordinates.
 
-## Formulae
+## Formula
 * [Haversine formula](https://en.wikipedia.org/wiki/Haversine_formula)
-* [incenty formula](https://en.wikipedia.org/wiki/Vincenty%27s_formulae)
+* [Vincenty formula](https://en.wikipedia.org/wiki/Vincenty%27s_formulae)
 
 ## Compilation
 * All: `make`
