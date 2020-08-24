@@ -10,6 +10,8 @@
 
 #define FLAT 1/298.257223563
 
+#define NORMALISE(x) fmodl(x + 360, 360)
+
 struct Coordinates {
 	long double lat;
 	long double lon;

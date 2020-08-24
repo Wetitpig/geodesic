@@ -16,6 +16,7 @@ int main(int argc, char **argv)
 	long double londiff, lambda, oldvalue, u1, u2;
 	long double ssig, csig, sig, salp, calp, cos2, C;
 	long double usq, k1, a, b, dsig, s;
+	long double start, end;
 
 	long double d = 0;
 	long double total = 0;
@@ -110,9 +111,28 @@ int main(int argc, char **argv)
 		dsig = b * ssig * (cos2 + b / 4 * (csig * (2 * sqr(cos2) - 1) - b / 6 * cos2 * (4 * sqr(ssig) - 3) * (4 * sqr(cos2) - 3)));
 		s = RAD_MIN * a * (sig - dsig);
 
+		if (fabsl(oldvalue - salp) > fabsl(oldvalue - lambda)) {
+			a = cosl(u2) * sinl(lambda);
+			b = cosl(u1) * sinl(u2) - sinl(u1) * cosl(u2) * cosl(lambda);
+			start = NORMALISE(atan2_modified(a, b) / (RAD));
+
+			a = cosl(u1) * sinl(lambda);
+			b = cosl(u1) * sinl(u2) * cosl(lambda) - sinl(u1) * cosl(u2);
+			end = NORMALISE(atan2_modified(a, b) / (RAD));
+		}
+		else {
+			a = salp / cosl(u1);
+			b = sqrtl(1 - sqr(a));
+			if (cosl(u1) * sinl(u2) + sinl(u1) * cosl(u2) * cosl(lambda) < 0)
+				b = b * -1;
+
+			start = fmodl(atan2_modified(a, b) / (RAD) + 360, 360);
+			end = fmodl(atan2_modified(salp, -sinl(u1) * ssig + cosl(u1) * csig * b) / (RAD) + 360, 360);
+		}
+
 		total += s;
 		memcpy(location, location + 1, sizeof(struct Coordinates));
-		printf("  \"%d\": %Lf,\n", i - 2, s);
+		printf("  \"%d\": {\n    \"distance\": %Lf,\n    \"start_azimuth\": %Lf,\n    \"end_azimuth\": %Lf\n  },\n", i - 2, s, start, end);
 	}
 
 	free(location);
