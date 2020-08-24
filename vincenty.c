@@ -22,8 +22,8 @@ int main(int argc, char **argv)
 
 	scan(argc, argv[1], location);
 
-	location->lat *= RAD;
-	location->lon *= RAD;
+	location->lat = location->lat * RAD;
+	location->lon = location->lon * RAD;
 
 	puts("{");
 
@@ -31,13 +31,20 @@ int main(int argc, char **argv)
 		if (scan(argc, argv[i], (location + 1)) == -1)
 			break;
 
-		(location + 1)->lat *= RAD;
-		(location + 1)->lon *= RAD;
-
+		(location + 1)->lat = (location + 1)->lat * RAD;
+		(location + 1)->lon = (location + 1)->lon * RAD;
 		londiff = (location + 1)->lon - location->lon;
 		lambda = londiff;
-		u1 = atanl((1 - FLAT) * tanl(location->lat));
-		u2 = atanl((1 - FLAT) * tanl((location + 1)->lat));
+
+		if (fabsl(location->lat) == M_PI_2)
+			u1 = location->lat > 0 ? M_PI_2 : -M_PI_2;
+		else
+			u1 = atanl((1 - FLAT) * tanl(location->lat));
+
+		if (fabsl((location + 1)->lat) == M_PI_2)
+			u2 = (location + 1)->lat > 0 ? M_PI_2 : -M_PI_2;
+		else
+			u2 = atanl((1 - FLAT) * tanl((location + 1)->lat));
 
 		do {
 			oldvalue = lambda;
@@ -50,8 +57,11 @@ int main(int argc, char **argv)
 			salp = cosl(u1) * cosl(u2) * sinl(lambda) / ssig;
 			calp = 1 - salp * salp;
 			cos2 = csig - 2 * sinl(u1) * sinl(u2) / calp;
+			if (cos2 < -1 || isnan(cos2))
+				cos2 = -1;
 
 			C = FLAT / 16 * calp * (4 + FLAT * (4 - 3 * calp));
+
 			lambda = londiff + (1 - C) * FLAT * salp * (sig + C * ssig * (cos2 + C * csig * (2 * cos2 * cos2 - 1)));
 
 			if (fabsl(lambda) > M_PI) {

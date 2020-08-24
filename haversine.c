@@ -19,8 +19,8 @@ int main(int argc, char **argv)
 
 	scan(argc, argv[1], location);
 
-	location->lat *= RAD;
-	location->lon *= RAD;
+	location->lat = location->lat * RAD;
+	location->lon = location->lon * RAD;
 
 	puts("{");
 
@@ -28,8 +28,8 @@ int main(int argc, char **argv)
 		if (scan(argc, argv[i], (location + 1)) == -1)
 			break;
 
-		(location + 1)->lat *= RAD;
-		(location + 1)->lon *= RAD;
+		(location + 1)->lat = (location + 1)->lat * RAD;
+		(location + 1)->lon = (location + 1)->lon * RAD;
 
 		latdiff = (location + 1)->lat - location->lat;
 		londiff = (location + 1)->lon - location->lon;
@@ -37,7 +37,11 @@ int main(int argc, char **argv)
 		a = sqr(sin(latdiff / 2));
 		b = sinl(londiff / 2);
 		a += cosl((location + 1)->lat) * cosl(location->lat) * sqr(b);
-		c = 2 * atan2l(sqrtl(a), sqrtl(1-a)) * RADIUS;
+
+		if (a >= 1)
+			c = M_PI * RADIUS;
+		else
+			c = 2 * atan2l(sqrtl(a), sqrtl(1-a)) * RADIUS;
 
 		total += c;
 		memcpy(location, location + 1, sizeof(struct Coordinates));
