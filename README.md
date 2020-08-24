@@ -23,16 +23,32 @@ For longitudes, positive is assumed for east.
 Output is in JSON format:
 ```
 {
-  "0": xxx,
-  "1": xxx,
+  "0": {
+    "distance": xxx,
+    "start_azimuth": xxx,
+    "end_azimuth": xxx
+  },
+  "1": {
+    "distance": xxx,
+    "start_azimuth": xxx,
+    "end_azimuth": xxx
+  },
   ...
-  "N": xxx,
+  "N": {
+    "distance": xxx,
+    "start_azimuth": xxx,
+    "end_azimuth": xxx
+  },
   "total_distance": xxx
 }
 ```
 Where
-each numbered pair specifies the distance between the nth point and (n+1)th point.
+each numbered pair specifies the following:
+* `distance` as the distance between the nth point and the (n+1)th point.
+* `start_azimuth` as the bearing at the nth point, on the line from the nth point to the (n+1)th point.
+* `end_azimuth` as the bearing at the (n+1)th point, on the line from the nth point to the (n+1)th point.
  
 `"total_distance"` specifies the total distance of the line joining all points.
  
 All distances are provided in kilometres.
+All angles are provided in degrees.
