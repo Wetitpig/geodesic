@@ -52,23 +52,23 @@ int main(int argc, char **argv)
 			ssig = sqrtl(sqr(cosl(u2) * sinl(lambda)) + sqr(cosl(u1) * sinl(u2) - sinl(u1) * cosl(u2) * cosl(lambda)));
 			csig = sinl(u1) * sinl(u2) + cosl(u1) * cosl(u2) * cosl(lambda);
 
-			sig = atan2l(ssig, csig);
+			sig = atan2_modified(ssig, csig);
 
 			salp = cosl(u1) * cosl(u2) * sinl(lambda) / ssig;
-			calp = 1 - salp * salp;
+			calp = 1 - sqr(salp);
 			cos2 = csig - 2 * sinl(u1) * sinl(u2) / calp;
 			if (cos2 < -1 || isnan(cos2))
 				cos2 = -1;
 
 			C = FLAT / 16 * calp * (4 + FLAT * (4 - 3 * calp));
 
-			lambda = londiff + (1 - C) * FLAT * salp * (sig + C * ssig * (cos2 + C * csig * (2 * cos2 * cos2 - 1)));
+			lambda = londiff + (1 - C) * FLAT * salp * (sig + C * ssig * (cos2 + C * csig * (2 * sqr(cos2) - 1)));
 
 			if (fabsl(lambda) > M_PI) {
 				d = 1;
 				break;
 			}
-		} while (fabsl(oldvalue - lambda) >= powl(10,-12));
+		} while (fabsl(oldvalue - lambda) >= powl(10,-15));
 
 		if (d == 1) {
 			londiff = (londiff > 0 ? M_PI : -M_PI) - londiff;
@@ -87,9 +87,9 @@ int main(int argc, char **argv)
 				C = FLAT / 16 * calp * (4 + FLAT * (4 - 3 * calp));
 				cos2 = csig - 2 * sinl(u1) * sinl(u2) / calp;
 
-				d = (1 - C) * FLAT * (sig + C * ssig * (cos2 + C * csig * (2 * cos2 * cos2 - 1)));
+				d = (1 - C) * FLAT * (sig + C * ssig * (cos2 + C * csig * (2 * sqr(cos2) - 1)));
 				salp = (londiff - asinl(lambda)) / d;
-				calp = 1 - salp * salp;
+				calp = 1 - sqr(salp);
 
 				lambda = salp * ssig / (cosl(u1) * cosl(u2));
 
@@ -98,16 +98,16 @@ int main(int argc, char **argv)
 				ssig = sqrtl(ssig);
 				sig = M_PI - asinl(ssig);
 
-			} while (fabsl(oldvalue - salp) >= powl(10,-12));
+			} while (fabsl(oldvalue - salp) >= powl(10,-15));
 		}
 
-		usq = calp * (RAD_MAJ * RAD_MAJ / (RAD_MIN * RAD_MIN) - 1);
+		usq = calp * (sqr(RAD_MAJ) / sqr(RAD_MIN) - 1);
 		k1 = sqrtl(1 + usq);
 		k1 = (k1 - 1) / (k1 + 1);
-		a = (1 + k1 * k1 / 4) / (1 - k1);
-		b = k1 * (1 - 3 / 8 * k1 * k1);
+		a = (1 + sqr(k1) / 4) / (1 - k1);
+		b = k1 * (1 - 3 / 8 * sqr(k1));
 
-		dsig = b * ssig * (cos2 + b / 4 * (csig * (2 * cos2 * cos2 - 1) - b / 6 * cos2 * (4 * ssig * ssig - 3) * (4 * cos2 * cos2 - 3)));
+		dsig = b * ssig * (cos2 + b / 4 * (csig * (2 * sqr(cos2) - 1) - b / 6 * cos2 * (4 * sqr(ssig) - 3) * (4 * sqr(cos2) - 3)));
 		s = RAD_MIN * a * (sig - dsig);
 
 		total += s;

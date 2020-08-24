@@ -38,10 +38,7 @@ int main(int argc, char **argv)
 		b = sinl(londiff / 2);
 		a += cosl((location + 1)->lat) * cosl(location->lat) * sqr(b);
 
-		if (a >= 1)
-			c = M_PI * RADIUS;
-		else
-			c = 2 * atan2l(sqrtl(a), sqrtl(1-a)) * RADIUS;
+		c = 2 * atan2_modified(sqrtl(a), sqrtl(1-a)) * RADIUS;
 
 		total += c;
 		memcpy(location, location + 1, sizeof(struct Coordinates));
