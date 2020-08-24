@@ -6,10 +6,11 @@ Programs for calculating distance between coordinates.
 * [Vincenty formula](https://en.wikipedia.org/wiki/Vincenty%27s_formulae)
 
 ## Compilation
-* All: `make`
-* haversine/vincenty: `make [haversine|vincenty]`
-
-All binaries will be located in `./bin` directory.
+```
+make
+make clean
+```
+A binary will be located in `./bin` directory (`bin/geodesic`).
 
 ## Usage
 Coordinates can be inputted from both command line and standard input (stdin).
