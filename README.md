@@ -6,8 +6,8 @@ A program for calculating distance between coordinates.
 * [incenty formula](https://en.wikipedia.org/wiki/Vincenty%27s_formulae)
 
 # Compilation
-* `gcc -o haversine haversine.c -lm`
-* `gcc -o vincenty vincenty.c -lm`
+* All: `make`
+* haversine/vincenty: `make [haversine|vincenty]`
 
 # Usage
 Coordinates can be inputted from both command line and standard input (stdin).

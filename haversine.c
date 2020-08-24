@@ -63,7 +63,7 @@ int main(int argc, char **argv)
 		total += c;
 		memcpy(location, location + 1, sizeof(struct Coordinates));
 
-		printf("  \"%d\": {\n    \"distance\": %Lf,\n    \"start_azimuth\": %Lf,\n    \"end_azimuth\": %Lf\n  },\n", i - 2, c, start, end);
+		print(i - 2, c, start, end);
 	}
 
 	free(location);
