@@ -3,15 +3,15 @@ CFLAGS=-O3 -Iinclude
 
 LDFLAGS=-lm
 
-all: haversine vincenty
+HEADERS = constants.h functions.h haversine.h vincenty.h
 
-haversine:
-	@mkdir -p bin
-	$(CC) $(CFLAGS) -o bin/haversine src/haversine.c src/math.c src/io.c $(LDFLAGS)
+%.o: src/%.c $(HEADERS)
+	$(CC) $(CFLAGS) -c -o $@ $<
 
-vincenty:
+all: src/haversine.o src/vincenty.o src/main.o src/io.o src/math.o
 	@mkdir -p bin
-	$(CC) $(CFLAGS) -o bin/vincenty src/vincenty.c src/math.c src/io.c $(LDFLAGS)
+	$(CC) $(CFLAGS) -o bin/geodesic src/haversine.o src/vincenty.o src/main.o src/io.o src/math.o -lm
+	@strip bin/geodesic
 
 clean:
-	rm -rf bin
+	rm -rf src/*.o
