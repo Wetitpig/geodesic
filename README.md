@@ -5,23 +5,23 @@ A program for calculating distance between coordinates.
 * [Haversine formula](https://en.wikipedia.org/wiki/Haversine_formula)
 * [incenty formula](https://en.wikipedia.org/wiki/Vincenty%27s_formulae)
 
-# Compilation
+## Compilation
 * All: `make`
 * haversine/vincenty: `make [haversine|vincenty]`
 
 All binaries will be located in `./bin` directory.
 
-# Usage
+## Usage
 Coordinates can be inputted from both command line and standard input (stdin).
 
-## Format of coordinates
+### Format of coordinates
 `[coordinates1] [coordinates2] ... [coordinatesN]`, where
 each coordinate is in the form of `latitude,longitude` in decimals.
 
 For latitudes, positive is assumed for north.
 For longitudes, positive is assumed for east.
 
-## Output
+### Output
 Output is in JSON format:
 ```
 {
@@ -52,6 +52,6 @@ each numbered pair specifies the following:
  
 `"total_distance"` specifies the total distance of the line joining all points.
 
-## Units
+### Units
 * All distances are provided in kilometres.
 * All angles are provided in degrees.
