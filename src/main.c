@@ -135,7 +135,7 @@ int main(int argc, char **argv)
 		free(location);
 
 		if (distance == 1 && i != 1)
-			printf("\n  {\n    \"total_distance\": %Lf\n  }", total);
+			printf(",\n  {\n    \"total_distance\": %Lf\n  }", total);
 		break;
 		}
 
