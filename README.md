@@ -14,27 +14,35 @@ A binary will be located in `./bin` directory (`bin/geodesic`).
 
 ## Usage
 ```
-geodesic [-f formula] [-s] [-o] [-h] [coordinate 1] [coordinate 2]
+geodesic [-p problem] [-f formula] [-s] [-o] [-h] [arguments]
 ```
 ### Options
-`-f [haversine|vincenty]` Formula for evaluating the azimuths and distances.
+`-p [direct|inverse]` Solve direct problem or inverse problem.
+* Direct problem: Given a coordinate and a vector of distance and initial bearing, evaluate the destination coordinate and the final bearing.
+* Inverse problem: Given 2 coordinates, evaluate the distance, the initial bearing and the final bearing.
+
+`-f [haversine|vincenty]` Select formula for evaluating the azimuths and distances.
 Current available formula are haversine and Vincenty's formula. Haversine formula is more resource-efficient, while Vincenty's formula is more accurate. Resource consumption effects are not noticeable for just a few coordinates.
 
-`-s` Show distance between coordinates.
+`-s` Show distance between coordinates for inverse problems, or show the destination coordinate for direct problems.
 
-`-o` Show azimuth from one coordinate to the next.
+`-o` Show azimuth from one coordinate to the next for inverse problems, or show the final bearing for direct problems.
 
 ### Arguments
-Coordinates can be inputted from both command line and standard input (stdin) in the form of:
+All arguments can be given from the command line or standard input (stdin).
+
+### Output
+Output is in JSON format.
+
+### Inverse problem
+
+#### Arguments
+Coordinates are given in the form of:
 
 `[coordinates1] [coordinates2] ... [coordinatesN]`, where
 each coordinate is in the form of `latitude,longitude` in decimals.
 
-For latitudes, positive is assumed for north.
-For longitudes, positive is assumed for east.
-
-### Output
-Output is in JSON format:
+#### Output
 ```
 {
   "0": {
@@ -64,6 +72,40 @@ each numbered pair specifies the following:
  
 `"total_distance"` specifies the total distance of the line joining all coordinates.
 
+### Direct problem
+
+#### Arguments
+Vectors are given in the form of:
+
+`[start coordinate] [vector1] [vector2] ... [vectorN]`, where
+each vector is in the form of `distance:bearing`, in decimals and degrees respectively.
+
+#### Output
+```
+{
+  "0": {
+    "coordinate": [xxx,xxx],
+    "azimuth": xxx
+  },
+  "1": {
+    "coordinate": [xxx,xxx],
+    "azimuth": xxx
+  },
+  ...
+  "N": {
+    "coordinate": [xxx,xxx],
+    "azimuth": xxx
+  }
+}
+```
+Where
+each numbered pair specifies the following:
+* `coordinate` as the destination coordinate at the distance and bearing from the (n-1)th coordinate.
+* `azimuth` as the bearing at `coordinate` (nth coordinate), on the line from (n-1)th coordinate to nth coordinate.
+
 ### Units
 * All distances are provided in kilometres.
 * All angles are provided in degrees.
+* For latitudes, positive is assumed for north.
+* For longitudes, positive is assumed for east.
+* For bearings, full bearing must be used.
