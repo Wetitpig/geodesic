@@ -13,7 +13,7 @@ void help(char *name)
 {
 	puts("Usage:");
 	printf("\n\t%s [options] [coordinate 1] [coordinate 2] ...\n", name);
-	printf("\t-h Show usage.\n\t-p [direct|inverse] Solve direct or inverse problem. \n\t-f [haversine|vincenty] Set formula to haversine or vincenty.\n\t-s Compute distance.\n\t-o Compute azimuths.\n\n");
+	printf("\t-h Show usage.\n\t-p [direct|inverse] Solve direct or inverse problem. \n\t-f [haversine|vincenty] Set formula to haversine or vincenty.\n\t-s Compute distances / coordinates.\n\t-o Compute azimuths.\n\n");
 	puts("More info in README.md");
 	return;
 }
