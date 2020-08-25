@@ -9,7 +9,7 @@ int scan_coordinates(int argc, char *argv, struct Coordinates *loc)
 	if (argc == 1)
 		count = scanf("%Lf,%Lf", &loc->lat, &loc->lon);
 	else
-		sscanf(argv, "%Lf,%Lf", &loc->lat, &loc->lon);
+		count = sscanf(argv, "%Lf,%Lf", &loc->lat, &loc->lon);
 
 	if (loc->lat < -90 || loc->lat > 90 || loc->lon < -180 || loc->lon > 180) {
 		printf("Coordinate %Lf,%Lf out of range.\nAbort.\n", loc->lat, loc->lon);

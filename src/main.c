@@ -76,13 +76,21 @@ int main(int argc, char **argv)
 
 	struct Coordinates *location = malloc(sizeof(struct Coordinates) * 2);
 
-	scan_coordinates(optind == argc, argv[optind], location);
+	if (scan_coordinates(optind == argc, argv[optind], location) != 2) {
+		puts("Incorrect format of coordinates");
+		exit(1);
+	}
 
 	putchar('{');
 
 	for (i = 1; optind == argc || (optind + i) < argc; ++i) {
-		if (optind != argc)
-			scan_coordinates(argc, argv[optind + i], location + 1);
+		if (optind != argc) {
+			if (scan_coordinates(argc, argv[optind + i], location + 1) != 2) {
+				putchar('\b');
+				puts("Incorrect format of coordinates");
+				exit(1);
+			}
+		}
 		else if (scan_coordinates(1, NULL, location + 1) == -1)
 			break;
 
@@ -146,14 +154,18 @@ int main(int argc, char **argv)
 	struct Coordinates *point = malloc(sizeof(struct Coordinates) * 2);
 	struct Vector *add = malloc(sizeof(struct Vector));
 
-	scan_coordinates(optind == argc, argv[optind], point);
+	if (scan_coordinates(optind == argc, argv[optind], point) != 2) {
+		puts("Incorrect format of coordinates");
+		exit(1);
+	}
 
 	putchar('{');
 
 	for (i = 1; optind == argc || (optind + i) < argc; i++) {
 		if (optind != argc) {
 			if (scan_vector(argc, argv[optind + i], add) != 2) {
-				puts("Inorrect format of vector.");
+				putchar('\b');
+				puts("Incorrect format of vector.");
 				exit(1);
 			}
 		}
