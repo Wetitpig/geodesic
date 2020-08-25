@@ -81,12 +81,9 @@ int main(int argc, char **argv)
 			exit(1);
 		}
 
-		putchar('{');
-
 		for (i = 1; optind == argc || (optind + i) < argc; ++i) {
 			if (optind != argc) {
 				if (scan_coordinates(argc, argv[optind + i], location + 1) != 2) {
-					putchar('\b');
 					puts("Incorrect format of coordinates");
 					exit(1);
 				}
@@ -94,11 +91,7 @@ int main(int argc, char **argv)
 			else if (scan_coordinates(1, NULL, location + 1) == -1)
 				break;
 
-			if (azimuth == 1 && i != 1)
-				printf(",");
-
-			printf("\n  \"%d\": {\n", i - 1);
-
+			start_print(i);
 			switch (j)
 			{
 				case 0:
@@ -123,7 +116,7 @@ int main(int argc, char **argv)
 				if (azimuth == 1)
 					printf(",\n");
 				else
-					printf("\n  },");
+					printf("\n  }");
 			}
 
 			if (azimuth == 1)
@@ -134,13 +127,13 @@ int main(int argc, char **argv)
 
 		free(location);
 
+		if (i == 1)
+			putchar('[');
 		if (distance == 1) {
-			if (azimuth == 1 && total != 0)
-				printf(",");
-			printf("\n  \"total_distance\": %Lf\n}\n", total);
+			if (i != 1)
+				putchar(',');
+			printf("\n  {\n    \"total_distance\": %Lf\n  }", total);
 		}
-		else
-			printf("\n}\n");
 		break;
 
 		case 0:
@@ -159,12 +152,10 @@ int main(int argc, char **argv)
 			exit(1);
 		}
 
-		putchar('{');
 
 		for (i = 1; optind == argc || (optind + i) < argc; i++) {
 			if (optind != argc) {
 				if (scan_vector(argc, argv[optind + i], add) != 2) {
-					putchar('\b');
 					puts("Incorrect format of vector.");
 					exit(1);
 				}
@@ -172,11 +163,7 @@ int main(int argc, char **argv)
 			else if (scan_vector(1, NULL, add) == -1)
 				break;
 
-			if (i != 1)
-				printf(",\n");
-
-			printf("\n  \"%d\": {\n", i - 1);
-
+			start_print(i);
 			switch (j)
 			{
 				case 0:
@@ -207,8 +194,9 @@ int main(int argc, char **argv)
 		free(point);
 		free(add);
 
-		printf("\n}\n");
 		break;
 	}
+
+	printf("\n]\n");
 	exit(0);
 }
