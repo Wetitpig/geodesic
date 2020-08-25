@@ -44,28 +44,30 @@ each coordinate is in the form of `latitude,longitude` in decimals.
 
 #### Output
 ```
-{
-  "0": {
+[
+  {
     "distance": xxx,
     "start_azimuth": xxx,
     "end_azimuth": xxx
   },
-  "1": {
+  {
     "distance": xxx,
     "start_azimuth": xxx,
     "end_azimuth": xxx
   },
   ...
-  "N": {
+  {
     "distance": xxx,
     "start_azimuth": xxx,
     "end_azimuth": xxx
   },
-  "total_distance": xxx
-}
+  {
+    "total_distance": xxx
+  }
+]
 ```
 Where
-each numbered pair specifies the following:
+each set of pairs in array specifies the following:
 * `distance` as the distance between the nth coordinate and the (n+1)th coordinate.
 * `start_azimuth` as the bearing at the nth coordinate, on the line from the nth coordinate to the (n+1)th coordinate.
 * `end_azimuth` as the bearing at the (n+1)th coordinate, on the line from the nth coordinate to the (n+1)th coordinate.
@@ -82,24 +84,24 @@ each vector is in the form of `distance:bearing`, in decimals and degrees respec
 
 #### Output
 ```
-{
-  "0": {
+[
+  {
     "coordinate": [xxx,xxx],
     "azimuth": xxx
   },
-  "1": {
+  {
     "coordinate": [xxx,xxx],
     "azimuth": xxx
   },
   ...
-  "N": {
+  {
     "coordinate": [xxx,xxx],
     "azimuth": xxx
   }
-}
+]
 ```
 Where
-each numbered pair specifies the following:
+each set of pairs in array specifies the following:
 * `coordinate` as the destination coordinate at the distance and bearing from the (n-1)th coordinate.
 * `azimuth` as the bearing at `coordinate` (nth coordinate), on the line from (n-1)th coordinate to nth coordinate.
 
