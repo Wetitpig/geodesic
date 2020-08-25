@@ -122,8 +122,8 @@ struct vincenty_result vincenty_inverse(struct Coordinates *location)
 		if (cosl(u1) * sinl(u2) + sinl(u1) * cosl(u2) * cosl(lambda) < 0)
 			b = b * -1;
 
-		start = fmodl(atan2_modified(a, b) / (RAD) + 360, 360);
-		end = fmodl(atan2_modified(salp, -sinl(u1) * ssig + cosl(u1) * csig * b) / (RAD) + 360, 360);
+		start = NORMALISE_A(atan2_modified(a, b) / (RAD));
+		end = NORMALISE_A(atan2_modified(salp, -sinl(u1) * ssig + cosl(u1) * csig * b) / (RAD));
 	}
 
 	struct vincenty_result result;

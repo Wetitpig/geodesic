@@ -18,7 +18,7 @@ long double haversine_inverse_distance(struct Coordinates *location)
 	return 2 * atan2_modified(sqrtl(a), sqrtl(1-a)) * RADIUS;
 }
 
-long double haversine_inverse_bearing(struct Coordinates *start, struct Coordinates *end)
+long double haversine_bearing(struct Coordinates *start, struct Coordinates *end)
 {
 	long double londiff, y, x;
 

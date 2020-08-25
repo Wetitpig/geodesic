@@ -105,8 +105,8 @@ int main(int argc, char **argv)
 				if (distance == 1)
 					c = haversine_inverse_distance(location);
 				if (azimuth == 1) {
-					start = NORMALISE_A(haversine_inverse_bearing(location, location + 1));
-					end = NORMALISE_A(haversine_inverse_bearing(location + 1, location) - 180);
+					start = NORMALISE_A(haversine_bearing(location, location + 1));
+					end = NORMALISE_A(haversine_bearing(location + 1, location) - 180);
 				}
 				break;
 				case 2:
@@ -167,7 +167,7 @@ int main(int argc, char **argv)
 				case 1:
 				*(point + 1) = haversine_direct(point, add);
 				if (azimuth == 1)
-					end = NORMALISE_A(haversine_inverse_bearing(point + 1, point) - 180);
+					end = NORMALISE_A(haversine_bearing(point + 1, point) - 180);
 				break;
 				case 2:
 				res = vincenty_direct(point, add);
