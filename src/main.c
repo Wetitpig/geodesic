@@ -101,7 +101,7 @@ int main(int argc, char **argv)
 			start_print(i);
 			switch (j)
 			{
-				case 0:
+				case 1:
 				if (distance == 1)
 					c = haversine_inverse_distance(location);
 				if (azimuth == 1) {
@@ -109,7 +109,7 @@ int main(int argc, char **argv)
 					end = NORMALISE_A(haversine_inverse_bearing(location + 1, location) - 180);
 				}
 				break;
-				case 1:
+				case 2:
 				res = vincenty_inverse(location);
 				c = res.distance;
 				start = NORMALISE_A(res.start);
@@ -151,7 +151,6 @@ int main(int argc, char **argv)
 			error();
 		}
 
-
 		for (i = 1; optind == argc || (optind + i) < argc; i++) {
 			if ((count = scan_vector(argc == optind, argv[optind + i], add)) != 2) {
 				if (optind == argc && count == -1)
@@ -165,12 +164,12 @@ int main(int argc, char **argv)
 			start_print(i);
 			switch (j)
 			{
-				case 0:
+				case 1:
 				*(point + 1) = haversine_direct(point, add);
 				if (azimuth == 1)
 					end = NORMALISE_A(haversine_inverse_bearing(point + 1, point) - 180);
 				break;
-				case 1:
+				case 2:
 				res = vincenty_direct(point, add);
 				(point + 1)->lat = res.distance;
 				(point + 1)->lon = res.start;
