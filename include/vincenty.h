@@ -1,4 +1,4 @@
-#include "constants.h"
+#include "geodesic.h"
 
 #ifndef __HAVE_VINCENTY_H__
 
@@ -10,6 +10,7 @@ struct vincenty_result {
 	long double end;
 };
 
-void vincenty(struct vincenty_result *result, struct Coordinates *location);
+struct vincenty_result vincenty_inverse(struct Coordinates *location);
+struct vincenty_result vincenty_direct(struct Coordinates *point, struct Vector *add);
 
 #endif

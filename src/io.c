@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "constants.h"
-#include "functions.h"
+#include "geodesic.h"
+#include "mathio.h"
 
-int scan(int argc, char *argv, struct Coordinates *loc)
+int scan_coordinates(int argc, char *argv, struct Coordinates *loc)
 {
 	int count = 0;
 	if (argc == 1)
@@ -16,12 +16,27 @@ int scan(int argc, char *argv, struct Coordinates *loc)
 		exit(1);
         }
 
+	loc->lat = loc->lat * RAD;
+	loc->lon = loc->lon * RAD;
+
 	return count;
 }
 
-void print(int order, long double s, long double start, long double end)
+int scan_vector(int argc, char *argv, struct Vector *vector)
 {
-	printf("  \"%d\": {\n    \"distance\": %Lf,\n    \"start_azimuth\": %Lf,\n    \"end_azimuth\": %Lf\n  },\n", order, s, start, end);
-	return;
+	int count = 0;
+	if (argc == 1)
+		count = scanf("%Lf:%Lf", &vector->s, &vector->theta);
+	else
+		count = sscanf(argv, "%Lf:%Lf", &vector->s, &vector->theta);
+
+	if (vector->theta < 0 || vector->theta > 360) {
+		printf("Bearing %Lf out of range. Abort.\n", vector->theta);
+		exit(1);
+	}
+
+	vector->theta = vector->theta * RAD;
+
+	return count;
 }
 

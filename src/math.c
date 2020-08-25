@@ -1,5 +1,5 @@
 #include <math.h>
-#include "functions.h"
+#include "mathio.h"
 
 long double sqr(long double operand)
 {
