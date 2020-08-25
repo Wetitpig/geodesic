@@ -111,3 +111,8 @@ each set of pairs in array specifies the following:
 * For latitudes, positive is assumed for north.
 * For longitudes, positive is assumed for east.
 * For bearings, full bearing must be used.
+
+## References
+1. [Movable Type Scripts](https://www.movable-type.co.uk/scripts/latlong.html)
+2. [Vincenty's formulae @ Wikipedia](https://en.wikipedia.org/wiki/Vincenty%27s_formulae)
+3. [Geodetic Inverse Solution between Antinodal Points](https://geographiclib.sourceforge.io/geodesic-papers/vincenty75b.pdf)
