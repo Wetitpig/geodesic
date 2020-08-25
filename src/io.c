@@ -12,7 +12,7 @@ int scan_coordinates(int argc, char *argv, struct Coordinates *loc)
 		count = sscanf(argv, "%Lf,%Lf", &loc->lat, &loc->lon);
 
 	if (count == 2 && (loc->lat < -90 || loc->lat > 90 || loc->lon < -180 || loc->lon > 180)) {
-		printf("Coordinate out of range: %Lf, %Lf.\n", loc->lat, loc->lon);
+		fprintf(stderr, "Coordinate out of range: %Lf, %Lf.\n", loc->lat, loc->lon);
 		error();
 	}
 
@@ -31,7 +31,7 @@ int scan_vector(int argc, char *argv, struct Vector *vector)
 		count = sscanf(argv, "%Lf:%Lf", &vector->s, &vector->theta);
 
 	if (count == 2 && (vector->theta < 0 || vector->theta > 360)) {
-		printf("Bearing out of range: %Lf.", vector->theta);
+		fprintf(stderr, "Bearing out of range: %Lf.", vector->theta);
 		error();
 	}
 
@@ -53,6 +53,6 @@ void start_print(int i)
 
 void error()
 {
-	puts("Abort.");
+	fprintf(stderr, "\nAbort.\n");
 	exit(1);
 }

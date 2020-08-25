@@ -11,10 +11,10 @@
 
 void help(char *name)
 {
-	puts("Usage:");
-	printf("\n\t%s [options] [coordinate 1] [coordinate 2] ...\n", name);
-	printf("\t-h Show usage.\n\t-p [direct|inverse] Solve direct or inverse problem. \n\t-f [haversine|vincenty] Set formula to haversine or Vincenty's.\n\t-s Compute distances / coordinates.\n\t-o Compute azimuths.\n\n");
-	puts("More info in README.md.");
+	fputs("Usage:", stderr);
+	fprintf(stderr, "\n\t%s [options] [coordinate 1] [coordinate 2] ...\n", name);
+	fprintf(stderr, "\t-h Show usage.\n\t-p [direct|inverse] Solve direct or inverse problem. \n\t-f [haversine|vincenty] Set formula to haversine or Vincenty's.\n\t-s Compute distances / coordinates.\n\t-o Compute azimuths.\n\n");
+	fprintf(stderr, "More info in README.md.\n");
 	return;
 }
 
@@ -33,7 +33,7 @@ int main(int argc, char **argv)
 			else if (strcmp(optarg, "inverse") == 0)
 				p = 2;
 			else {
-				puts("Invalid problem.");
+				fputs("Invalid problem.", stderr);
 				error();
 			}
 			break;
@@ -43,7 +43,7 @@ int main(int argc, char **argv)
 			else if (strcmp(optarg, "vincenty") == 0)
 				j = 2;
 			else {
-				puts("Invalid formula.");
+				fputs("Invalid formula.", stderr);
 				error();
 			}
 			break;
@@ -65,12 +65,12 @@ int main(int argc, char **argv)
 
 
 	if (distance == 0 && azimuth == 0) {
-		puts("Nothing to be shown.");
+		fputs("Nothing to be shown.", stderr);
 		error();
 	}
 
 	if (j == 0) {
-		puts("No formula defined.");
+		fputs("No formula defined.", stderr);
 		error();
 	}
 
@@ -84,7 +84,7 @@ int main(int argc, char **argv)
 		struct Coordinates *location = malloc(sizeof(struct Coordinates) * 2);
 
 		if (scan_coordinates(optind == argc, argv[optind], location) != 2) {
-			puts("Incorrect format of coordinates.");
+			fputs("Incorrect format of coordinates.", stderr);
 			error();
 		}
 
@@ -93,7 +93,7 @@ int main(int argc, char **argv)
 				if (optind == argc && count == -1)
 					break;
 				else {
-					puts("Incorrect format of coordinates.");
+					fputs("Incorrect format of coordinates.", stderr);
 					error();
 				}
 			}
@@ -147,7 +147,7 @@ int main(int argc, char **argv)
 		struct Vector *add = malloc(sizeof(struct Vector));
 
 		if (scan_coordinates(optind == argc, argv[optind], point) != 2) {
-			puts("Incorrect format of coordinates.");
+			fputs("Incorrect format of coordinates.", stderr);
 			error();
 		}
 
@@ -157,7 +157,7 @@ int main(int argc, char **argv)
 				if (optind == argc && count == -1)
 					break;
 				else {
-					puts("Incorrect format of vector.");
+					fputs("Incorrect format of vector.", stderr);
 					error();
 				}
 			}
@@ -197,7 +197,7 @@ int main(int argc, char **argv)
 		break;
 		}
 		default:
-		puts("No problem defined.");
+		fputs("No problem defined.", stderr);
 		error();
 		break;
 	}
