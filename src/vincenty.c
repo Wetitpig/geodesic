@@ -1,6 +1,5 @@
 #include <math.h>
 #include "geodesic.h"
-#include "mathio.h"
 #include "vincenty.h"
 
 long double reduced_latitude(long double lat)

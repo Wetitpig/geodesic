@@ -1,8 +1,8 @@
 #include <math.h>
 
-#ifndef __HAVE_GEODESIC_H__
+#ifndef __HAVE_GEODESIC_MATH_H__
 
-#define __HAVE_GEODESIC_H__
+#define __HAVE_GEODESIC_MATH_H__
 
 #define RADIUS 6371.0088
 #define RAD M_PI / 180
@@ -24,5 +24,8 @@ struct Vector {
 	long double s;
 	long double theta;
 };
+
+long double sqr(long double operand);
+long double atan2_modified(long double y, long double x);
 
 #endif

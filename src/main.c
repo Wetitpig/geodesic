@@ -5,7 +5,7 @@
 #include <strings.h>
 
 #include "geodesic.h"
-#include "mathio.h"
+#include "io.h"
 #include "haversine.h"
 #include "vincenty.h"
 

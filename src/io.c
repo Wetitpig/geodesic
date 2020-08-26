@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "geodesic.h"
-#include "mathio.h"
+#include "io.h"
 
 int scan_coordinates(int argc, char *argv, struct Coordinates *loc)
 {

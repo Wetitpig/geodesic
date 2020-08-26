@@ -1,6 +1,5 @@
 #include <math.h>
 #include "geodesic.h"
-#include "mathio.h"
 #include "haversine.h"
 
 long double haversine_inverse_distance(struct Coordinates *location)
