@@ -37,7 +37,7 @@ void start_print(FILE *out, int i)
 	if (i == 1)
 		fputs("[\n", out);
 	else
-		fputs(",", out);
+		fputs(",\n", out);
 
 	fputs("  {\n", out);
 	return;
