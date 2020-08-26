@@ -14,7 +14,7 @@ A binary will be located in `./bin` directory (`bin/geodesic`).
 
 ## Usage
 ```
-geodesic [-p problem] [-f formula] [-s] [-o] [-h] [arguments]
+geodesic [-p problem] [-f formula] [-s] [-a] [-h] [arguments]
 ```
 ### Options
 `-p [direct|inverse]` Solve direct problem or inverse problem.
@@ -26,7 +26,7 @@ Current available formula are haversine and Vincenty's formula. Haversine formul
 
 `-s` Show distance between coordinates for inverse problems, or show the destination coordinate for direct problems.
 
-`-o` Show azimuth from one coordinate to the next for inverse problems, or show the final bearing for direct problems.
+`-a` Show azimuth from one coordinate to the next for inverse problems, or show the final bearing for direct problems.
 
 ### Arguments
 All arguments can be given from the command line or standard input (stdin).

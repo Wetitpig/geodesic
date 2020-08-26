@@ -13,7 +13,7 @@ void help(char *name)
 {
 	fputs("Usage:", stderr);
 	fprintf(stderr, "\n\t%s [options] [coordinate 1] [coordinate 2] ...\n", name);
-	fprintf(stderr, "\t-h Show usage.\n\t-p [direct|inverse] Solve direct or inverse problem. \n\t-f [haversine|vincenty] Set formula to haversine or Vincenty's.\n\t-s Compute distances / coordinates.\n\t-o Compute azimuths.\n\n");
+	fprintf(stderr, "\t-h Show usage.\n\t-p [direct|inverse] Solve direct or inverse problem. \n\t-f [haversine|vincenty] Set formula to haversine or Vincenty's.\n\t-s Compute distances / coordinates.\n\t-a Compute azimuths.\n\n");
 	fprintf(stderr, "More info in README.md.\n");
 	return;
 }
@@ -24,7 +24,7 @@ int main(int argc, char **argv)
 	int i, j = 0, p = 0, count;
 	int distance = 0, azimuth = 0;
 
-	while ((i = getopt(argc, argv, "p:f:soh")) != -1) {
+	while ((i = getopt(argc, argv, "p:f:sah")) != -1) {
 		switch (i)
 		{
 			case 'p':
@@ -50,7 +50,7 @@ int main(int argc, char **argv)
 			case 's':
 			distance = 1;
 			break;
-			case 'o':
+			case 'a':
 			azimuth = 1;
 			break;
 			case 'h':
