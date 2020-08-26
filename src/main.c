@@ -11,10 +11,20 @@
 
 void help(char *name)
 {
-	fputs("Usage:", stderr);
-	fprintf(stderr, "\n\t%s [options] [coordinate 1] [coordinate 2] ...\n", name);
-	fprintf(stderr, "\t-h Show usage.\n\t-p [direct|inverse] Solve direct or inverse problem. \n\t-f [haversine|vincenty] Set formula to haversine or Vincenty's.\n\t-s Compute distances / coordinates.\n\t-a Compute azimuths.\n\n");
-	fprintf(stderr, "More info in README.md.\n");
+	fputs("Usage:\n", stderr);
+	fprintf(stderr, "\t%s [options] [coordinate 1] [coordinate 2] ...\n", name);
+	fprintf(stderr, "\t-h Show usage.\n");
+
+	fputs("Computation options:\n", stderr);
+	fprintf(stderr, "\t-p [direct|inverse] Solve direct or inverse problem. \n");
+	fprintf(stderr, "\t-f [haversine|vincenty] Set formula to haversine or Vincenty's.\n");
+	fprintf(stderr, "\t-s Compute distances / coordinates.\n");
+	fprintf(stderr, "\t-a Compute azimuths.\n");
+
+	fputs("IO options:\n", stderr);
+	fprintf(stderr, "\t-i [-|FILE] Input from stdin or FILE. stdin is assumed for - or missing argument.\n");
+	fprintf(stderr, "\t-o [-|FILE] Output to stdout or FILE. stdout is assumed for - or missing argument.\n");
+	fprintf(stderr, "\nMore info in README.md.\n");
 	return;
 }
 
@@ -24,9 +34,28 @@ int main(int argc, char **argv)
 	int i, j = 0, p = 0, count;
 	int distance = 0, azimuth = 0;
 
-	while ((i = getopt(argc, argv, "p:f:sah")) != -1) {
+	FILE *in, *out;
+	in = stdin;
+	out = stdout;
+
+	while ((i = getopt(argc, argv, "i:o:p:f:sah")) != -1) {
 		switch (i)
 		{
+			case 'i':
+			if (strcmp(optarg, "-") != 0) {
+				in = fopen(optarg, "r");
+				if (in == NULL) {
+					perror(optarg);
+					error();
+				}
+			}
+			break;
+
+			case 'o':
+			if (strcmp(optarg, "-") != 0)
+				out = fopen(optarg, "w");
+			break;
+
 			case 'p':
 			if (strcmp(optarg, "direct") == 0)
 				p = 1;
@@ -37,6 +66,7 @@ int main(int argc, char **argv)
 				error();
 			}
 			break;
+
 			case 'f':
 			if (strcmp(optarg, "haversine") == 0)
 				j = 1;
@@ -47,22 +77,25 @@ int main(int argc, char **argv)
 				error();
 			}
 			break;
+
 			case 's':
 			distance = 1;
 			break;
+
 			case 'a':
 			azimuth = 1;
 			break;
+
 			case 'h':
 			help(argv[0]);
 			exit(1);
 			break;
+
 			default:
 			exit(1);
 			break;
 		}
 	}
-
 
 	if (distance == 0 && azimuth == 0) {
 		fputs("Nothing to be shown.", stderr);
@@ -83,22 +116,13 @@ int main(int argc, char **argv)
 		long double c, total = 0, start, end;
 		struct Coordinates *location = malloc(sizeof(struct Coordinates) * 2);
 
-		if (scan_coordinates(optind == argc, argv[optind], location) != 2) {
+		if (scan_coordinates(in, location) != 2) {
 			fputs("Incorrect format of coordinates.", stderr);
 			error();
 		}
 
-		for (i = 1; optind == argc || (optind + i) < argc; ++i) {
-			if ((count = scan_coordinates(optind == argc, argv[optind + i], location + 1)) != 2) {
-				if (optind == argc && count == -1)
-					break;
-				else {
-					fputs("Incorrect format of coordinates.", stderr);
-					error();
-				}
-			}
-
-			start_print(i);
+		for (i = 1; (count = scan_coordinates(in, location + 1)) == 2; i++) {
+			start_print(out, i);
 			switch (j)
 			{
 				case 1:
@@ -119,23 +143,26 @@ int main(int argc, char **argv)
 
 			if (distance == 1) {
 				total += c;
-				printf("    \"distance\": %Lf", c);
+				fprintf(out, "    \"distance\": %Lf", c);
 				if (azimuth == 1)
-					printf(",\n");
+					fprintf(out, ",\n");
 				else
-					printf("\n  }");
+					fprintf(out, "\n  }");
 			}
 
 			if (azimuth == 1)
-				printf("    \"start_azimuth\": %Lf,\n    \"end_azimuth\": %Lf\n  }", start, end);
+				fprintf(out, "    \"start_azimuth\": %Lf,\n    \"end_azimuth\": %Lf\n  }", start, end);
 
 			memcpy(location, location + 1, sizeof(struct Coordinates));
 		}
 
 		free(location);
-
+		if (count != -1) {
+			fputs("Incorrect format of coordinates.", stderr);
+			error();
+		}
 		if (distance == 1 && i != 1)
-			printf(",\n  {\n    \"total_distance\": %Lf\n  }", total);
+			fprintf(out, ",\n  {\n    \"total_distance\": %Lf\n  }", total);
 		break;
 		}
 
@@ -146,22 +173,13 @@ int main(int argc, char **argv)
 		struct Coordinates *point = malloc(sizeof(struct Coordinates) * 2);
 		struct Vector *add = malloc(sizeof(struct Vector));
 
-		if (scan_coordinates(optind == argc, argv[optind], point) != 2) {
+		if (scan_coordinates(in, point) != 2) {
 			fputs("Incorrect format of coordinates.", stderr);
 			error();
 		}
 
-		for (i = 1; optind == argc || (optind + i) < argc; i++) {
-			if ((count = scan_vector(argc == optind, argv[optind + i], add)) != 2) {
-				if (optind == argc && count == -1)
-					break;
-				else {
-					fputs("Incorrect format of vector.", stderr);
-					error();
-				}
-			}
-
-			start_print(i);
+		for (i = 1; ((count = scan_vector(in, add)) == 2); i++) {
+			start_print(out, i);
 			switch (j)
 			{
 				case 1:
@@ -178,20 +196,24 @@ int main(int argc, char **argv)
 			}
 
 			if (distance == 1) {
-				printf("    \"coordinate\": [%Lf,%Lf]", (point + 1)->lat / (RAD), (point + 1)->lon / (RAD));
+				fprintf(out, "    \"coordinate\": [%Lf,%Lf]", (point + 1)->lat / (RAD), (point + 1)->lon / (RAD));
 				if (azimuth == 1)
-					printf(",\n");
+					fprintf(out, ",\n");
 			}
 
 			if (azimuth == 1)
-				printf("    \"azimuth\": %Lf", end);
+				fprintf(out, "    \"azimuth\": %Lf", end);
 
-			printf("\n  }");
+			fprintf(out, "\n  }");
 			memcpy(point, point + 1, sizeof(struct Coordinates));
 		}
 
 		free(point);
 		free(add);
+		if (count != -1) {
+			fputs("Incorrect format of vector.", stderr);
+			error();
+		}
 
 		break;
 		}
@@ -202,7 +224,13 @@ int main(int argc, char **argv)
 	}
 
 	if (i == 1)
-		putchar('[');
-	printf("\n]\n");
+		fputc('[', out);
+	fprintf(out, "\n]\n");
+
+	if (in != stdin)
+		fclose(in);
+	if (out != stdout)
+		fclose(out);
+
 	exit(0);
 }

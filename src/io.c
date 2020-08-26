@@ -3,13 +3,9 @@
 #include "geodesic.h"
 #include "io.h"
 
-int scan_coordinates(int argc, char *argv, struct Coordinates *loc)
+int scan_coordinates(FILE *in, struct Coordinates *loc)
 {
-	int count = 0;
-	if (argc == 1)
-		count = scanf("%Lf,%Lf", &loc->lat, &loc->lon);
-	else
-		count = sscanf(argv, "%Lf,%Lf", &loc->lat, &loc->lon);
+	int count = fscanf(in, "%Lf,%Lf", &loc->lat, &loc->lon);
 
 	if (count == 2 && (loc->lat < -90 || loc->lat > 90 || loc->lon < -180 || loc->lon > 180)) {
 		fprintf(stderr, "Coordinate out of range: %Lf, %Lf.\n", loc->lat, loc->lon);
@@ -22,13 +18,9 @@ int scan_coordinates(int argc, char *argv, struct Coordinates *loc)
 	return count;
 }
 
-int scan_vector(int argc, char *argv, struct Vector *vector)
+int scan_vector(FILE *in, struct Vector *vector)
 {
-	int count = 0;
-	if (argc == 1)
-		count = scanf("%Lf:%Lf", &vector->s, &vector->theta);
-	else
-		count = sscanf(argv, "%Lf:%Lf", &vector->s, &vector->theta);
+	int count = fscanf(in, "%Lf:%Lf", &vector->s, &vector->theta);
 
 	if (count == 2 && (vector->theta < 0 || vector->theta > 360)) {
 		fprintf(stderr, "Bearing out of range: %Lf.", vector->theta);
@@ -40,14 +32,14 @@ int scan_vector(int argc, char *argv, struct Vector *vector)
 	return count;
 }
 
-void start_print(int i)
+void start_print(FILE *out, int i)
 {
 	if (i == 1)
-		puts("[");
+		fputs("[\n", out);
 	else
-		puts(",");
+		fputs(",", out);
 
-	puts("  {");
+	fputs("  {\n", out);
 	return;
 }
 

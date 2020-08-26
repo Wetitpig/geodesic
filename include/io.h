@@ -4,10 +4,10 @@
 
 #define __HAVE_MATHIO_H__
 
-int scan_coordinates(int argc, char *argv, struct Coordinates *loc);
-int scan_vector(int argc, char *argv, struct Vector *vector);
+int scan_coordinates(FILE *in, struct Coordinates *loc);
+int scan_vector(FILE *in, struct Vector *vector);
 
-void start_print(int i);
+void start_print(FILE *out, int i);
 void error();
 
 long double sqr(long double operand);
