@@ -30,10 +30,13 @@ static inline long double Cfromcalp(long double calp)
 
 struct vincenty_result vincenty_inverse(struct Coordinates *location)
 {
-	long double londiff, lambda, oldvalue, u1, u2;
+	long double londiff, lambda, u1, u2;
 	long double ssig, csig, sig, salp, calp, cos2, C;
 	long double a, b, dsig, s;
 	long double start, end;
+
+	long double oldvalue[2];
+	oldvalue[0] = 0;
 
 	struct Coordinates ab;
 
@@ -46,7 +49,8 @@ struct vincenty_result vincenty_inverse(struct Coordinates *location)
 	u2 = reduced_latitude((location + 1)->lat);
 
 	do {
-		oldvalue = lambda;
+		oldvalue[1] = oldvalue[0];
+		oldvalue[0] = lambda;
 
 		ssig = sqrtl(sqr(cosl(u2) * sinl(lambda)) + sqr(cosl(u1) * sinl(u2) - sinl(u1) * cosl(u2) * cosl(lambda)));
 		csig = sinl(u1) * sinl(u2) + cosl(u1) * cosl(u2) * cosl(lambda);
@@ -63,11 +67,11 @@ struct vincenty_result vincenty_inverse(struct Coordinates *location)
 
 		lambda = londiff + (1 - C) * FLAT * salp * (sig + C * ssig * (cos2 + C * csig * (2 * sqr(cos2) - 1)));
 
-		if (fabsl(lambda) > M_PI) {
+		if (oldvalue[1] == lambda && fabsl(lambda) > M_PI) {
 			d = 1;
 			break;
 		}
-	} while (fabsl(oldvalue - lambda) >= powl(10,-15));
+	} while (fabsl(oldvalue[0] - lambda) >= powl(10,-15));
 
 	if (d == 1) {
 		londiff = (londiff > 0 ? M_PI : -M_PI) - londiff;
@@ -81,7 +85,7 @@ struct vincenty_result vincenty_inverse(struct Coordinates *location)
 		csig = cosl(sig);
 
 		do {
-			oldvalue = salp;
+			oldvalue[0] = salp;
 			C = Cfromcalp(calp);
 			cos2 = csig - 2 * sinl(u1) * sinl(u2) / calp;
 
@@ -96,7 +100,7 @@ struct vincenty_result vincenty_inverse(struct Coordinates *location)
 			ssig = sqrtl(ssig);
 			sig = M_PI - asinl(ssig);
 
-		} while (fabsl(oldvalue - salp) >= powl(10,-15));
+		} while (fabsl(oldvalue[0] - salp) >= powl(10,-15));
 	}
 
 	ab = helmert(calp);
@@ -106,7 +110,7 @@ struct vincenty_result vincenty_inverse(struct Coordinates *location)
 	dsig = b * ssig * (cos2 + b / 4 * (csig * (2 * sqr(cos2) - 1) - b / 6 * cos2 * (4 * sqr(ssig) - 3) * (4 * sqr(cos2) - 3)));
 	s = RAD_MIN * a * (sig - dsig);
 
-	if (fabsl(oldvalue - salp) > fabsl(oldvalue - lambda)) {
+	if (fabsl(oldvalue[0] - salp) > fabsl(oldvalue[0] - lambda)) {
 		a = cosl(u2) * sinl(lambda);
 		b = cosl(u1) * sinl(u2) - sinl(u1) * cosl(u2) * cosl(lambda);
 		start = atan2_modified(a, b) / (RAD);
