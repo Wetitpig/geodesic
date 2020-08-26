@@ -13,7 +13,7 @@
 #define FLAT 1/298.257223563
 
 #define NORMALISE_A(x) fmodl(x + 360, 360)
-#define NORMALISE_C(x) (x > M_PI ? x - 2 * M_PI : x)
+#define NORMALISE_C(x) x - 2 * M_PI * (x > M_PI)
 
 struct Coordinates {
 	long double lat;
