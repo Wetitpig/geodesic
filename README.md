@@ -14,15 +14,16 @@ A binary will be located in `./bin` directory (`bin/geodesic`).
 
 ## Usage
 ```
-geodesic [-i file] [-o file] [-k precision] [-p problem] [-f formula] [-s] [-a] [-h]
+geodesic [-i file] [-o file] [-k precision] [-p problem] [-f projection] [-s] [-a] [-h]
 ```
 ### Computation Options
 `-p [direct|inverse]` Solve direct problem or inverse problem.
 * Direct problem: Given a coordinate and a vector of distance and initial bearing, evaluate the destination coordinate and the final bearing.
 * Inverse problem: Given 2 coordinates, evaluate the distance, the initial bearing and the final bearing.
 
-`-f [haversine|vincenty]` Select formula for evaluating the azimuths and distances.
-Current available formula are haversine and Vincenty's formula. Haversine formula is more resource-efficient, while Vincenty's formula is more accurate. Resource consumption effects are not noticeable for just a few coordinates.
+`-f [sphere|ellipsoid]` Select projection for evaluating the azimuths and distances.
+* Sphere projection employs the haversine algorithm. Error is higher (error ~0.5%).
+* Ellipsoid projection employs the Vincenty's algorithm. It is more resource-intensive (2x sphere projection).
 
 `-s` Show distance between coordinates for inverse problems, or show the destination coordinate for direct problems.
 

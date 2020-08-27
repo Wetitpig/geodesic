@@ -17,7 +17,7 @@ void help(char *name)
 
 	fputs("Computation options:\n", stderr);
 	fputs("\t-p [direct|inverse] Solve direct or inverse problem. \n", stderr);
-	fputs("\t-f [haversine|vincenty] Set formula to haversine or Vincenty's.\n", stderr);
+	fputs("\t-f [sphere|ellipsoid] Set projection to sphere or ellipsoid.\n", stderr);
 	fputs("\t-s Compute distances / coordinates.\n", stderr);
 	fputs("\t-a Compute azimuths.\n", stderr);
 
@@ -77,9 +77,9 @@ int main(int argc, char **argv)
 			break;
 
 			case 'f':
-			if (strcmp(optarg, "haversine") == 0)
+			if (strcmp(optarg, "sphere") == 0)
 				j = 1;
-			else if (strcmp(optarg, "vincenty") == 0)
+			else if (strcmp(optarg, "ellipsoid") == 0)
 				j = 2;
 			else {
 				fputs("Invalid formula.", stderr);
