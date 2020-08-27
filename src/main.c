@@ -148,7 +148,7 @@ int main(int argc, char **argv)
 
 			if (distance == 1) {
 				total += c;
-				sprintf(writeout, "%s    \"distance\": %Lf", writeout, c);
+				sprintf(writeout, "%s    \"distance\": %LF", writeout, c);
 				if (azimuth == 1)
 					strcat(writeout, ",\n");
 				else
@@ -156,7 +156,7 @@ int main(int argc, char **argv)
 			}
 
 			if (azimuth == 1)
-				sprintf(writeout, "%s    \"start_azimuth\": %Lf,\n    \"end_azimuth\": %Lf\n  }", writeout, start / RAD, end / RAD);
+				sprintf(writeout, "%s    \"start_azimuth\": %LF,\n    \"end_azimuth\": %LF\n  }", writeout, start / RAD, end / RAD);
 
 			memcpy(location, location + 1, sizeof(struct Coordinates));
 
@@ -170,7 +170,7 @@ int main(int argc, char **argv)
 			error();
 		}
 		if (distance == 1 && i != 1)
-			fprintf(out, ",\n  {\n    \"total_distance\": %Lf\n  }", total);
+			fprintf(out, ",\n  {\n    \"total_distance\": %LF\n  }", total);
 		break;
 		}
 
@@ -207,7 +207,7 @@ int main(int argc, char **argv)
 				memcpy(point + 1, point, sizeof(struct Coordinates));
 
 			if (distance == 1) {
-				sprintf(writeout, "%s    \"coordinate\": [%Lf,%Lf]", writeout, (point + 1)->lat / RAD, (point + 1)->lon / RAD);
+				sprintf(writeout, "%s    \"coordinate\": [%LF,%LF]", writeout, (point + 1)->lat / RAD, (point + 1)->lon / RAD);
 				if (azimuth == 1)
 					strcat(writeout, ",\n");
 			}
@@ -215,7 +215,7 @@ int main(int argc, char **argv)
 			if (azimuth == 1) {
 				if (add->s == 0 && isnan(end))
 					end = add->theta;
-				sprintf(writeout, "%s    \"azimuth\": %Lf", writeout, end / RAD);
+				sprintf(writeout, "%s    \"azimuth\": %LF", writeout, end / RAD);
 			}
 
 			strcat(writeout, "\n  }");

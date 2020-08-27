@@ -5,10 +5,10 @@
 
 int scan_coordinates(FILE *in, struct Coordinates *loc)
 {
-	int count = fscanf(in, "%Lf,%Lf", &loc->lat, &loc->lon);
+	int count = fscanf(in, "%LF,%LF", &loc->lat, &loc->lon);
 
 	if (count == 2 && (loc->lat < -90 || loc->lat > 90 || loc->lon < -180 || loc->lon > 180)) {
-		fprintf(stderr, "Coordinate out of range: %Lf, %Lf.\n", loc->lat, loc->lon);
+		fprintf(stderr, "Coordinate out of range: %LF, %LF.\n", loc->lat, loc->lon);
 		error();
 	}
 
@@ -20,10 +20,10 @@ int scan_coordinates(FILE *in, struct Coordinates *loc)
 
 int scan_vector(FILE *in, struct Vector *vector)
 {
-	int count = fscanf(in, "%Lf:%Lf", &vector->s, &vector->theta);
+	int count = fscanf(in, "%LF:%LF", &vector->s, &vector->theta);
 
 	if (count == 2 && (vector->theta < 0 || vector->theta > 360)) {
-		fprintf(stderr, "Bearing out of range: %Lf.", vector->theta);
+		fprintf(stderr, "Bearing out of range: %LF.", vector->theta);
 		error();
 	}
 
