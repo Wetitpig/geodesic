@@ -16,7 +16,7 @@ A binary will be located in `./bin` directory (`bin/geodesic`).
 ```
 geodesic [-p problem] [-f formula] [-s] [-a] [-h] [arguments]
 ```
-### Options
+### Computation Options
 `-p [direct|inverse]` Solve direct problem or inverse problem.
 * Direct problem: Given a coordinate and a vector of distance and initial bearing, evaluate the destination coordinate and the final bearing.
 * Inverse problem: Given 2 coordinates, evaluate the distance, the initial bearing and the final bearing.
@@ -28,11 +28,10 @@ Current available formula are haversine and Vincenty's formula. Haversine formul
 
 `-a` Show azimuth from one coordinate to the next for inverse problems, or show the final bearing for direct problems.
 
-### Arguments
-All arguments can be given from the command line or standard input (stdin).
+### IO Options
+`-i [FILE|-]` Input file. `-` signifies standard in (stdin). Defaults to stdin without the option.
 
-### Output
-Output is in JSON format.
+`-o [FILE|-]` Output file. `-` signifies standard out (stdout). Defaults to stdout without the option.
 
 ### Inverse problem
 
@@ -111,6 +110,9 @@ each set of pairs in array specifies the following:
 * For latitudes, positive is assumed for north.
 * For longitudes, positive is assumed for east.
 * For bearings, full bearing must be used.
+
+### Notes
+* `allow_nan` should be set to `true` for parsing JSON, because azimuths may return a `NaN` value for zero vectors depending on the algorithm.
 
 ## References
 1. [Movable Type Scripts](https://www.movable-type.co.uk/scripts/latlong.html)
