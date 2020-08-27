@@ -24,6 +24,7 @@ void help(char *name)
 	fputs("IO options:\n", stderr);
 	fputs("\t-i [-|FILE] Input from stdin or FILE. stdin is assumed for - or missing argument.\n", stderr);
 	fputs("\t-o [-|FILE] Output to stdout or FILE. stdout is assumed for - or missing argument.\n", stderr);
+	fputs("\t-k [int] Precision of output values.\n", stderr);
 	fputs("\nMore info in README.md.\n", stderr);
 	return;
 }
@@ -31,14 +32,14 @@ void help(char *name)
 
 int main(int argc, char **argv)
 {
-	int i, j = 0, p = 0, count;
+	int i, j = 0, p = 0, count, precision = 6;
 	int distance = 0, azimuth = 0;
 
 	FILE *in, *out;
 	in = stdin;
 	out = stdout;
 
-	while ((i = getopt(argc, argv, "i:o:p:f:sah")) != -1) {
+	while ((i = getopt(argc, argv, "i:o:k:p:f:sah")) != -1) {
 		switch (i)
 		{
 			case 'i':
@@ -54,6 +55,14 @@ int main(int argc, char **argv)
 			case 'o':
 			if (strcmp(optarg, "-") != 0)
 				out = fopen(optarg, "w");
+			break;
+
+			case 'k':
+			precision = atoi(optarg);
+			if (precision < 0) {
+				fputs("Precision must be positive value", stderr);
+				error();
+			}
 			break;
 
 			case 'p':
@@ -148,7 +157,7 @@ int main(int argc, char **argv)
 
 			if (distance == 1) {
 				total += c;
-				sprintf(writeout, "%s    \"distance\": %LF", writeout, c);
+				sprintf(writeout, "%s    \"distance\": %.*LF", writeout, precision, c);
 				if (azimuth == 1)
 					strcat(writeout, ",\n");
 				else
@@ -156,7 +165,7 @@ int main(int argc, char **argv)
 			}
 
 			if (azimuth == 1)
-				sprintf(writeout, "%s    \"start_azimuth\": %LF,\n    \"end_azimuth\": %LF\n  }", writeout, start / RAD, end / RAD);
+				sprintf(writeout, "%s    \"start_azimuth\": %.*LF,\n    \"end_azimuth\": %.*LF\n  }", writeout, precision, start / RAD, precision, end / RAD);
 
 			memcpy(location, location + 1, sizeof(struct Coordinates));
 
@@ -170,7 +179,7 @@ int main(int argc, char **argv)
 			error();
 		}
 		if (distance == 1 && i != 1)
-			fprintf(out, ",\n  {\n    \"total_distance\": %LF\n  }", total);
+			fprintf(out, ",\n  {\n    \"total_distance\": %.*LF\n  }", precision, total);
 		break;
 		}
 
@@ -207,7 +216,7 @@ int main(int argc, char **argv)
 				memcpy(point + 1, point, sizeof(struct Coordinates));
 
 			if (distance == 1) {
-				sprintf(writeout, "%s    \"coordinate\": [%LF,%LF]", writeout, (point + 1)->lat / RAD, (point + 1)->lon / RAD);
+				sprintf(writeout, "%s    \"coordinate\": [%.*LF,%.*LF]", writeout, precision, (point + 1)->lat / RAD, precision, (point + 1)->lon / RAD);
 				if (azimuth == 1)
 					strcat(writeout, ",\n");
 			}
@@ -215,7 +224,7 @@ int main(int argc, char **argv)
 			if (azimuth == 1) {
 				if (add->s == 0 && isnan(end))
 					end = add->theta;
-				sprintf(writeout, "%s    \"azimuth\": %LF", writeout, end / RAD);
+				sprintf(writeout, "%s    \"azimuth\": %.*LF", writeout, precision, end / RAD);
 			}
 
 			strcat(writeout, "\n  }");
