@@ -33,6 +33,8 @@ Current available formula are haversine and Vincenty's formula. Haversine formul
 
 `-o [FILE|-]` Output file. `-` signifies standard out (stdout). Defaults to stdout without the option.
 
+`-k [integer]` Set the number of decimal places in output. Default is 6.
+
 ### Inverse problem
 
 #### Arguments
