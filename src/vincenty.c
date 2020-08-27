@@ -36,6 +36,7 @@ struct vincenty_result vincenty_inverse(struct Coordinates *location)
 	long double ssig, csig, sig, salp, calp, cos2, c;
 	long double a, b, dsig, s;
 	long double start, end;
+	int i = 0;
 
 	long double oldvalue[2];
 	oldvalue[0] = 0;
@@ -69,7 +70,7 @@ struct vincenty_result vincenty_inverse(struct Coordinates *location)
 
 		lambda = londiff + (1 - c) * FLAT * salp * (sig + c * ssig * (cos2 + c * csig * (2 * sqr(cos2) - 1)));
 
-		if (fabsl(oldvalue[1]) > M_PI && fabsl(oldvalue[0]) < M_PI && fabsl(lambda) > M_PI) {
+		if (i++ > 8192 || (oldvalue[1] == lambda && fabsl(lambda) > M_PI)) {
 			d = 1;
 			break;
 		}
@@ -79,6 +80,7 @@ struct vincenty_result vincenty_inverse(struct Coordinates *location)
 		londiff = (londiff > 0 ? M_PI : -M_PI) - londiff;
 		lambda = 0;
 
+		i = 0;
 		calp = 0.5;
 		cos2 = 0;
 
