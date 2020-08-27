@@ -14,7 +14,7 @@ A binary will be located in `./bin` directory (`bin/geodesic`).
 
 ## Usage
 ```
-geodesic [-p problem] [-f formula] [-s] [-a] [-h] [arguments]
+geodesic [-i file] [-o file] [-k precision] [-p problem] [-f formula] [-s] [-a] [-h]
 ```
 ### Computation Options
 `-p [direct|inverse]` Solve direct problem or inverse problem.
