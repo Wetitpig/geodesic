@@ -13,18 +13,18 @@ void help(char *name)
 {
 	fputs("Usage:\n", stderr);
 	fprintf(stderr, "\t%s [options] [coordinate 1] [coordinate 2] ...\n", name);
-	fprintf(stderr, "\t-h Show usage.\n");
+	fputs("\t-h Show usage.\n", stderr);
 
 	fputs("Computation options:\n", stderr);
-	fprintf(stderr, "\t-p [direct|inverse] Solve direct or inverse problem. \n");
-	fprintf(stderr, "\t-f [haversine|vincenty] Set formula to haversine or Vincenty's.\n");
-	fprintf(stderr, "\t-s Compute distances / coordinates.\n");
-	fprintf(stderr, "\t-a Compute azimuths.\n");
+	fputs("\t-p [direct|inverse] Solve direct or inverse problem. \n", stderr);
+	fputs("\t-f [haversine|vincenty] Set formula to haversine or Vincenty's.\n", stderr);
+	fputs("\t-s Compute distances / coordinates.\n", stderr);
+	fputs("\t-a Compute azimuths.\n", stderr);
 
 	fputs("IO options:\n", stderr);
-	fprintf(stderr, "\t-i [-|FILE] Input from stdin or FILE. stdin is assumed for - or missing argument.\n");
-	fprintf(stderr, "\t-o [-|FILE] Output to stdout or FILE. stdout is assumed for - or missing argument.\n");
-	fprintf(stderr, "\nMore info in README.md.\n");
+	fputs("\t-i [-|FILE] Input from stdin or FILE. stdin is assumed for - or missing argument.\n", stderr);
+	fputs("\t-o [-|FILE] Output to stdout or FILE. stdout is assumed for - or missing argument.\n", stderr);
+	fputs("\nMore info in README.md.\n", stderr);
 	return;
 }
 
@@ -149,9 +149,9 @@ int main(int argc, char **argv)
 				total += c;
 				fprintf(out, "    \"distance\": %Lf", c);
 				if (azimuth == 1)
-					fprintf(out, ",\n");
+					fputs(",\n", out);
 				else
-					fprintf(out, "\n  }");
+					fputs("\n  }", out);
 			}
 
 			if (azimuth == 1)
@@ -205,7 +205,7 @@ int main(int argc, char **argv)
 			if (distance == 1) {
 				fprintf(out, "    \"coordinate\": [%Lf,%Lf]", (point + 1)->lat / RAD, (point + 1)->lon / RAD);
 				if (azimuth == 1)
-					fprintf(out, ",\n");
+					fputs(",\n", out);
 			}
 
 			if (azimuth == 1) {
@@ -214,7 +214,7 @@ int main(int argc, char **argv)
 				fprintf(out, "    \"azimuth\": %Lf", end / RAD);
 			}
 
-			fprintf(out, "\n  }");
+			fputs("\n  }", out);
 			memcpy(point, point + 1, sizeof(struct Coordinates));
 		}
 
@@ -238,7 +238,7 @@ int main(int argc, char **argv)
 
 	if (i == 1)
 		fputc('[', out);
-	fprintf(out, "\n]\n");
+	fputs("\n]\n", out);
 	if (out != stdout)
 		fclose(out);
 

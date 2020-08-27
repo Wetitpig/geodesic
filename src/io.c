@@ -40,11 +40,14 @@ void start_print(FILE *out, int i)
 		fputs(",\n", out);
 
 	fputs("  {\n", out);
+
+	if (i % 10000 == 0)
+		fprintf(stderr, "%d values processed.\n", i);
 	return;
 }
 
 void error()
 {
-	fprintf(stderr, "\nAbort.\n");
+	fputs("\nAbort.\n", stderr);
 	exit(1);
 }
