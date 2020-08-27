@@ -24,16 +24,29 @@ long double haversine_bearing(struct Coordinates *start, struct Coordinates *end
 	londiff = end->lon - start->lon;
 	y = sinl(londiff) * cosl(end->lat);
 	x = cosl(start->lat) * sinl(end->lat) - sinl(start->lat) * cosl(end->lat) * cosl(londiff);
-	return atan2_modified(y, x) / (RAD);
+	return normalise_a(atan2_modified(y, x));
 }
 
 struct Coordinates haversine_direct(struct Coordinates *point, struct Vector *add)
 {
 	struct Coordinates result;
-	long double delta = add->s / RADIUS;
+	long double delta = add->s / RADIUS, y, x;
 
-	result.lat = asinl(sinl(point->lat) * cosl(delta) + cosl(point->lat) * sinl(delta) * cosl(add->theta));
-	result.lon = point->lon + atan2_modified(sinl(add->theta) * sinl(delta) * cosl(point->lat), cosl(delta) - sinl(point->lat) * sinl(result.lat));
-	result.lon = NORMALISE_C(result.lon);
+	result.lat = sinl(point->lat) * cosl(delta) + cosl(point->lat) * sinl(delta) * cosl(add->theta);
+
+	x = cosl(delta) * sinl(point->lat) * result.lat;
+	result.lat = asinl(result.lat);
+	y = sinl(add->theta) * sinl(delta) * cosl(point->lat);
+	if (x == 0 && y == 0) {
+		y = cosl(delta) - sinl(point->lat) * sinl(result.lat);
+		x = cosl(point->lat) * cosl(result.lat);
+		result.lon = acosl(y / x);
+		if (result.lon < 0)
+			result.lon = M_PI_2 - result.lon;
+	}
+	else
+		result.lon = atan2_modified(y, x);
+
+	result.lon = normalise_c(result.lon + point->lon);
 	return result;
 }

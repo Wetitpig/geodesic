@@ -113,11 +113,11 @@ struct vincenty_result vincenty_inverse(struct Coordinates *location)
 	if (fabsl(oldvalue[0] - salp) > fabsl(oldvalue[0] - lambda)) {
 		a = cosl(u2) * sinl(lambda);
 		b = cosl(u1) * sinl(u2) - sinl(u1) * cosl(u2) * cosl(lambda);
-		start = atan2_modified(a, b) / (RAD);
+		start = atan2_modified(a, b);
 
 		a = cosl(u1) * sinl(lambda);
 		b = cosl(u1) * sinl(u2) * cosl(lambda) - sinl(u1) * cosl(u2);
-		end = atan2_modified(a, b) / (RAD);
+		end = atan2_modified(a, b);
 	}
 	else {
 		a = salp / cosl(u1);
@@ -125,14 +125,14 @@ struct vincenty_result vincenty_inverse(struct Coordinates *location)
 		if (cosl(u1) * sinl(u2) + sinl(u1) * cosl(u2) * cosl(lambda) < 0)
 			b = b * -1;
 
-		start = NORMALISE_A(atan2_modified(a, b) / (RAD));
-		end = NORMALISE_A(atan2_modified(salp, -sinl(u1) * ssig + cosl(u1) * csig * b) / (RAD));
+		start = atan2_modified(a, b);
+		end = atan2_modified(salp, -sinl(u1) * ssig + cosl(u1) * csig * b);
 	}
 
 	struct vincenty_result result;
 	result.distance = s;
-	result.start = start;
-	result.end = end;
+	result.start = normalise_a(start);
+	result.end = normalise_a(end);
 	return result;
 }
 
@@ -168,9 +168,9 @@ struct vincenty_result vincenty_direct(struct Coordinates *point, struct Vector 
 	c = Cfromcalp(1 - sqr(salp));
 	result.start = lambda - (1 - c) * FLAT * salp * (sigma + c * sinl(sigma) * (cosl(s2) + c * cosl(sigma) * (2 * sqr(cosl(s2)) - 1)));
 	result.start += point->lon;
-	result.start = NORMALISE_C(result.start);
+	result.start = normalise_c(result.start);
 
-	result.end = atan2_modified(salp, -sinl(u1) * sinl(sigma) + cosl(u1) * cosl(sigma) * cosl(add->theta)) / (RAD);
+	result.end = normalise_a(atan2_modified(salp, -sinl(u1) * sinl(sigma) + cosl(u1) * cosl(sigma) * cosl(add->theta)));
 
 	return result;
 }

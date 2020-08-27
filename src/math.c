@@ -26,3 +26,17 @@ long double atan2_modified(long double y, long double x)
 			return NAN;
 	}
 }
+
+long double normalise_a(long double x)
+{
+	return fmodl(x + 2 * M_PI, 2 * M_PI);
+}
+
+long double normalise_c(long double x)
+{
+	if (x > M_PI)
+		return x - 2 * M_PI;
+	else if (x < -M_PI)
+		return x + 2 * M_PI;
+	return x;
+}

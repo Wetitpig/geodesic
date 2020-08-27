@@ -123,23 +123,27 @@ int main(int argc, char **argv)
 
 		for (i = 1; (count = scan_coordinates(in, location + 1)) == 2; i++) {
 			start_print(out, i);
+
 			switch (j)
 			{
 				case 1:
 				if (distance == 1)
 					c = haversine_inverse_distance(location);
 				if (azimuth == 1) {
-					start = NORMALISE_A(haversine_bearing(location, location + 1));
-					end = NORMALISE_A(haversine_bearing(location + 1, location) - 180);
+					start = haversine_bearing(location, location + 1);
+					end = haversine_bearing(location + 1, location);
 				}
 				break;
 				case 2:
 				res = vincenty_inverse(location);
 				c = res.distance;
-				start = NORMALISE_A(res.start);
-				end = NORMALISE_A(res.end);
+				start = res.start;
+				end = res.end;
 				break;
 			}
+
+			if (isnan(c) && location->lat == (location + 1)->lat && location->lon == (location + 1)->lon)
+				c = 0;
 
 			if (distance == 1) {
 				total += c;
@@ -151,7 +155,7 @@ int main(int argc, char **argv)
 			}
 
 			if (azimuth == 1)
-				fprintf(out, "    \"start_azimuth\": %Lf,\n    \"end_azimuth\": %Lf\n  }", start, end);
+				fprintf(out, "    \"start_azimuth\": %Lf,\n    \"end_azimuth\": %Lf\n  }", start / RAD, end / RAD);
 
 			memcpy(location, location + 1, sizeof(struct Coordinates));
 		}
@@ -185,24 +189,30 @@ int main(int argc, char **argv)
 				case 1:
 				*(point + 1) = haversine_direct(point, add);
 				if (azimuth == 1)
-					end = NORMALISE_A(haversine_bearing(point + 1, point) - 180);
+						end = haversine_bearing(point + 1, point);
 				break;
 				case 2:
 				res = vincenty_direct(point, add);
 				(point + 1)->lat = res.distance;
 				(point + 1)->lon = res.start;
-				end = NORMALISE_A(res.end);
+				end = res.end;
 				break;
 			}
 
+			if ((isnan((point + 1)->lat) || isnan((point + 1)->lon)) && add->s == 0)
+				memcpy(point + 1, point, sizeof(struct Coordinates));
+
 			if (distance == 1) {
-				fprintf(out, "    \"coordinate\": [%Lf,%Lf]", (point + 1)->lat / (RAD), (point + 1)->lon / (RAD));
+				fprintf(out, "    \"coordinate\": [%Lf,%Lf]", (point + 1)->lat / RAD, (point + 1)->lon / RAD);
 				if (azimuth == 1)
 					fprintf(out, ",\n");
 			}
 
-			if (azimuth == 1)
-				fprintf(out, "    \"azimuth\": %Lf", end);
+			if (azimuth == 1) {
+				if (add->s == 0 && isnan(end))
+					end = add->theta;
+				fprintf(out, "    \"azimuth\": %Lf", end / RAD);
+			}
 
 			fprintf(out, "\n  }");
 			memcpy(point, point + 1, sizeof(struct Coordinates));
@@ -223,12 +233,12 @@ int main(int argc, char **argv)
 		break;
 	}
 
+	if (in != stdin)
+		fclose(in);
+
 	if (i == 1)
 		fputc('[', out);
 	fprintf(out, "\n]\n");
-
-	if (in != stdin)
-		fclose(in);
 	if (out != stdout)
 		fclose(out);
 
