@@ -108,6 +108,7 @@ int main(int argc, char **argv)
 	}
 
 	struct vincenty_result res;
+	char *writeout = calloc(1024, sizeof(char));
 
 	switch (p)
 	{
@@ -122,7 +123,7 @@ int main(int argc, char **argv)
 		}
 
 		for (i = 1; (count = scan_coordinates(in, location + 1)) == 2; i++) {
-			start_print(out, i);
+			start_print(writeout, i);
 
 			switch (j)
 			{
@@ -147,17 +148,20 @@ int main(int argc, char **argv)
 
 			if (distance == 1) {
 				total += c;
-				fprintf(out, "    \"distance\": %Lf", c);
+				sprintf(writeout, "%s    \"distance\": %Lf", writeout, c);
 				if (azimuth == 1)
-					fputs(",\n", out);
+					strcat(writeout, ",\n");
 				else
-					fputs("\n  }", out);
+					strcat(writeout, "\n  }");
 			}
 
 			if (azimuth == 1)
-				fprintf(out, "    \"start_azimuth\": %Lf,\n    \"end_azimuth\": %Lf\n  }", start / RAD, end / RAD);
+				sprintf(writeout, "%s    \"start_azimuth\": %Lf,\n    \"end_azimuth\": %Lf\n  }", writeout, start / RAD, end / RAD);
 
 			memcpy(location, location + 1, sizeof(struct Coordinates));
+
+			fputs(writeout, out);
+			memset(writeout, 0, 1024);
 		}
 
 		free(location);
@@ -183,7 +187,7 @@ int main(int argc, char **argv)
 		}
 
 		for (i = 1; ((count = scan_vector(in, add)) == 2); i++) {
-			start_print(out, i);
+			start_print(writeout, i);
 			switch (j)
 			{
 				case 1:
@@ -203,19 +207,22 @@ int main(int argc, char **argv)
 				memcpy(point + 1, point, sizeof(struct Coordinates));
 
 			if (distance == 1) {
-				fprintf(out, "    \"coordinate\": [%Lf,%Lf]", (point + 1)->lat / RAD, (point + 1)->lon / RAD);
+				sprintf(writeout, "%s    \"coordinate\": [%Lf,%Lf]", writeout, (point + 1)->lat / RAD, (point + 1)->lon / RAD);
 				if (azimuth == 1)
-					fputs(",\n", out);
+					strcat(writeout, ",\n");
 			}
 
 			if (azimuth == 1) {
 				if (add->s == 0 && isnan(end))
 					end = add->theta;
-				fprintf(out, "    \"azimuth\": %Lf", end / RAD);
+				sprintf(writeout, "%s    \"azimuth\": %Lf", writeout, end / RAD);
 			}
 
-			fputs("\n  }", out);
+			strcat(writeout, "\n  }");
 			memcpy(point, point + 1, sizeof(struct Coordinates));
+
+			fputs(writeout, out);
+			memset(writeout, 0, 1024);
 		}
 
 		free(point);
@@ -233,6 +240,7 @@ int main(int argc, char **argv)
 		break;
 	}
 
+	free(writeout);
 	if (in != stdin)
 		fclose(in);
 

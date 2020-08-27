@@ -7,7 +7,7 @@
 int scan_coordinates(FILE *in, struct Coordinates *loc);
 int scan_vector(FILE *in, struct Vector *vector);
 
-void start_print(FILE *out, int i);
+void start_print(char *out, int i);
 void error();
 
 long double sqr(long double operand);

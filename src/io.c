@@ -32,14 +32,14 @@ int scan_vector(FILE *in, struct Vector *vector)
 	return count;
 }
 
-void start_print(FILE *out, int i)
+void start_print(char *out, int i)
 {
 	if (i == 1)
-		fputs("[\n", out);
+		*out = '[';
 	else
-		fputs(",\n", out);
+		*out = ',';
 
-	fputs("  {\n", out);
+	sprintf(out, "%s\n  {\n", out);
 
 	if (i % 10000 == 0)
 		fprintf(stderr, "%d values processed.\n", i);
