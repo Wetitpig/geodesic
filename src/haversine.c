@@ -12,7 +12,7 @@ long double haversine_inverse_distance(struct Coordinates *location)
 
 	a = sqr(sin(latdiff / 2));
 	b = sinl(londiff / 2);
-	a += cosl((location + 1)->lat) * cosl(location->lat) * sqr(b);
+	a = a + cosl((location + 1)->lat) * cosl(location->lat) * sqr(b);
 
 	return 2 * atan2_modified(sqrtl(a), sqrtl(1-a)) * RADIUS;
 }
