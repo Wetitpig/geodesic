@@ -17,17 +17,24 @@ A binary will be located in `./bin` directory (`bin/geodesic`).
 geodesic [-i file] [-o file] [-k precision] [-p problem] [-f projection] [-s] [-a] [-h]
 ```
 ### Computation Options
-`-p [direct|inverse]` Solve direct problem or inverse problem.
+`-p [direct|inverse|polygon]` Solve direct problem or inverse problem.
 * Direct problem: Given a coordinate and a vector of distance and initial bearing, evaluate the destination coordinate and the final bearing.
 * Inverse problem: Given 2 coordinates, evaluate the distance, the initial bearing and the final bearing.
+* Polygon problem: Given a set of coordinates, evaluate the perimeter and area.
 
 `-f [sphere|ellipsoid]` Select projection for evaluating the azimuths and distances.
 * Sphere projection employs the haversine algorithm. Error is higher (error ~0.5%).
 * Ellipsoid projection employs the Vincenty's algorithm. It is more resource-intensive (2x sphere projection).
 
-`-s` Show distance between coordinates for inverse problems, or show the destination coordinate for direct problems.
+`-s` Different computations for different problems.
+* Distance between coordinates for inverse problems.
+* The destination coordinate for direct problems.
+* The perimeter for polygon problems.
 
-`-a` Show azimuth from one coordinate to the next for inverse problems, or show the final bearing for direct problems.
+`-a` Different computations for different problems.
+* Initial and final bearings from one coordinate to the next for inverse problems.
+* The final bearing for direct problems.
+* The area for polygon problems.
 
 ### IO Options
 `-i [FILE|-]` Input file. `-` signifies standard in (stdin). Defaults to stdin without the option.
@@ -78,6 +85,7 @@ each set of pairs in array specifies the following:
 
 ### Direct problem
 
+
 #### Arguments
 Vectors are given in the form of:
 
@@ -106,6 +114,31 @@ Where
 each set of pairs in array specifies the following:
 * `coordinate` as the destination coordinate at the distance and bearing from the (n-1)th coordinate.
 * `azimuth` as the bearing at `coordinate` (nth coordinate), on the line from (n-1)th coordinate to nth coordinate.
+
+### Polygon problem
+
+### Arguments
+Coordinates are given in the form of:
+
+`[coordinates1] [coordinates2] ... [coordinatesN] [coordinates1]`, where
+each coordinate is in the form of `latitude,longitude` in decimals.
+
+Coordinates of a polygon should be specified in the **counter-clockwise** direction.
+
+Note that `coordinate1` must be placed at the end to close the polygon.
+
+#### Output
+```
+[
+  {
+    "perimeter": xxx,
+    "area": xxx
+  }
+]
+```
+Where
+* `perimeter` denotes the perimeter of the polygon.
+* `area` denotes the area of the polygon.
 
 ### Units
 * All distances are provided in kilometres.

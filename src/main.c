@@ -17,11 +17,13 @@ void help(char *name)
 	fprintf(stderr, "\t%s [options] [coordinate 1] [coordinate 2] ...\n", name);
 	fputs("\t-h Show usage.\n", stderr);
 
-	fputs("Computation options:\n", stderr);
-	fputs("\t-p [direct|inverse] Solve direct or inverse problem. \n", stderr);
+	fputs("Algorithm options:\n", stderr);
+	fputs("\t-p [direct|inverse|polygon] Solve direct or inverse problem or polygon problem. \n", stderr);
 	fputs("\t-f [sphere|ellipsoid] Set projection to sphere or ellipsoid.\n", stderr);
-	fputs("\t-s Compute distances / coordinates.\n", stderr);
-	fputs("\t-a Compute azimuths.\n", stderr);
+
+	fputs("Computation options:\n", stderr);
+	fputs("\t-s Compute distances (a.k.a. perimeter) / coordinates.\n", stderr);
+	fputs("\t-a Compute azimuths (for direct / inverse problem). Compute area (for polygon problem).\n", stderr);
 
 	fputs("IO options:\n", stderr);
 	fputs("\t-i [-|FILE] Input from stdin or FILE. stdin is assumed for - or missing argument.\n", stderr);
