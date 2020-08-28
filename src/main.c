@@ -152,7 +152,7 @@ int main(int argc, char **argv)
 				break;
 			}
 
-			if (isnan(c) && location->lat == (location + 1)->lat && location->lon == (location + 1)->lon)
+			if (isnan(c) && memcmp(location, location + 1, sizeof(struct Coordinates)) == 0)
 				c = 0;
 
 			if (distance == 1) {
@@ -202,7 +202,7 @@ int main(int argc, char **argv)
 				case 1:
 				*(point + 1) = haversine_direct(point, add);
 				if (azimuth == 1)
-						end = haversine_bearing(point + 1, point);
+					end = haversine_bearing(point + 1, point);
 				break;
 				case 2:
 				res = vincenty_direct(point, add);
