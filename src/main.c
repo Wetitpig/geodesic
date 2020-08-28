@@ -8,6 +8,7 @@
 #include "io.h"
 #include "haversine.h"
 #include "vincenty.h"
+#include "greatcircle.h"
 
 void help(char *name)
 {
@@ -70,6 +71,8 @@ int main(int argc, char **argv)
 				p = 1;
 			else if (strcmp(optarg, "inverse") == 0)
 				p = 2;
+			else if (strcmp(optarg, "area") == 0)
+				p = 3;
 			else {
 				fputs("Invalid problem.", stderr);
 				error();
@@ -106,7 +109,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if (distance == 0 && azimuth == 0) {
+	if (distance == 0 && azimuth == 0 && p < 3) {
 		fputs("Nothing to be shown.", stderr);
 		error();
 	}
@@ -243,6 +246,44 @@ int main(int argc, char **argv)
 
 		break;
 		}
+
+		case 3:
+		{
+		struct Coordinates *vertex = malloc(sizeof(struct Coordinates));
+		long double gexcess = 0;
+		long double area;
+
+		int pole = 0;
+		i = 0;
+
+		while ((count = scan_coordinates(in, vertex + i)) == 2)
+			vertex = realloc(vertex, sizeof(struct Coordinates) * (++i + 1));
+		if (count != -1) {
+			fputs("Incorrect format of coordinates.", stderr);
+			error();
+		}
+		if (memcmp(vertex + --i, vertex, sizeof(struct Coordinates)) != 0) {
+			fputs("Not a closed polygon.", stderr);
+			error();
+		}
+
+		start_print(writeout, 1);
+		switch (j)
+		{
+			case 1:
+			area = greatcircle_area(vertex, i);
+			break;
+			case 2:
+			break;
+		}
+
+		free(vertex);
+
+		sprintf(writeout, "%s    \"area\": %.*LF\n  }", writeout, precision, area);
+		fputs(writeout, out);
+		break;
+		}
+
 		default:
 		fputs("No problem defined.", stderr);
 		error();
@@ -253,7 +294,7 @@ int main(int argc, char **argv)
 	if (in != stdin)
 		fclose(in);
 
-	if (i == 1)
+	if (i == 1 && p < 3)
 		fputc('[', out);
 	fputs("\n]\n", out);
 	if (out != stdout)

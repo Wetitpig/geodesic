@@ -3,7 +3,7 @@ CFLAGS=-O3 -Iinclude -g
 
 LDFLAGS=-lm
 
-HEADERS = constants.h functions.h haversine.h vincenty.h
+HEADERS = constants.h functions.h haversine.h vincenty.h greatcircle.h
 
 %.o: src/%.c $(HEADERS)
 	$(CC) $(CFLAGS) -c -o $@
@@ -11,7 +11,7 @@ HEADERS = constants.h functions.h haversine.h vincenty.h
 all: debug
 	@strip bin/geodesic
 
-debug: src/haversine.o src/vincenty.o src/main.o src/io.o src/math.o
+debug: src/haversine.o src/vincenty.o src/main.o src/io.o src/math.o src/greatcircle.o
 	@mkdir -p bin
 	$(CC) $(CFLAGS) -o bin/geodesic $^ $(LDFLAGS)
 
