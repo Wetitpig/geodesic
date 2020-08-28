@@ -5,6 +5,7 @@
 #define __HAVE_GREATCIRCLE_H__
 
 long double greatcircle_area(struct Coordinates *vertex, int i);
+long double greatcircle_perimeter(struct Coordinates *vertex, int i);
 
 #endif
 

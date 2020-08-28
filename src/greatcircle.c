@@ -17,3 +17,13 @@ long double greatcircle_area(struct Coordinates *vertex, int i)
 
 	return fabsl(RADIUS * RADIUS * excess);	
 }
+
+long double greatcircle_perimeter(struct Coordinates *vertex, int i)
+{
+	long double perimeter = 0;
+	int k;
+	for (k = 0; k < i; k++)
+		perimeter += haversine_inverse_distance(vertex + k);
+
+	return perimeter;
+}

@@ -48,7 +48,7 @@ int main(int argc, char **argv)
 				in = fopen(optarg, "r");
 				if (in == NULL) {
 					perror(optarg);
-					error();
+					error(NULL);
 				}
 			}
 			break;
@@ -60,10 +60,8 @@ int main(int argc, char **argv)
 
 			case 'k':
 			precision = atoi(optarg);
-			if (precision < 0) {
-				fputs("Precision must be positive value", stderr);
-				error();
-			}
+			if (precision < 0)
+				error("Precision must be positive value");
 			break;
 
 			case 'p':
@@ -71,12 +69,10 @@ int main(int argc, char **argv)
 				p = 1;
 			else if (strcmp(optarg, "inverse") == 0)
 				p = 2;
-			else if (strcmp(optarg, "area") == 0)
+			else if (strcmp(optarg, "polygon") == 0)
 				p = 3;
-			else {
-				fputs("Invalid problem.", stderr);
-				error();
-			}
+			else
+				error("Invalid problem.");
 			break;
 
 			case 'f':
@@ -84,10 +80,8 @@ int main(int argc, char **argv)
 				j = 1;
 			else if (strcmp(optarg, "ellipsoid") == 0)
 				j = 2;
-			else {
-				fputs("Invalid formula.", stderr);
-				error();
-			}
+			else
+				error("Invalid formula.");
 			break;
 
 			case 's':
@@ -109,15 +103,11 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if (distance == 0 && azimuth == 0 && p < 3) {
-		fputs("Nothing to be shown.", stderr);
-		error();
-	}
+	if (distance == 0 && azimuth == 0)
+		error("Nothing to be shown.");
 
-	if (j == 0) {
-		fputs("No formula defined.", stderr);
-		error();
-	}
+	if (j == 0)
+		error("No formula defined.");
 
 	struct vincenty_result res;
 	char *writeout = calloc(1024, sizeof(char));
@@ -129,10 +119,8 @@ int main(int argc, char **argv)
 		long double c, total = 0, start, end;
 		struct Coordinates *location = malloc(sizeof(struct Coordinates) * 2);
 
-		if (scan_coordinates(in, location) != 2) {
-			fputs("Incorrect format of coordinates.", stderr);
-			error();
-		}
+		if (scan_coordinates(in, location) != 2)
+			error("Incorrect format of coordinates.");
 
 		for (i = 1; (count = scan_coordinates(in, location + 1)) == 2; i++) {
 			start_print(writeout, i);
@@ -177,10 +165,8 @@ int main(int argc, char **argv)
 		}
 
 		free(location);
-		if (count != -1) {
-			fputs("Incorrect format of coordinates.", stderr);
-			error();
-		}
+		if (count != -1)
+			error("Incorrect format of coordinates.");
 		if (distance == 1 && i != 1)
 			fprintf(out, ",\n  {\n    \"total_distance\": %.*LF\n  }", precision, total);
 		break;
@@ -193,10 +179,8 @@ int main(int argc, char **argv)
 		struct Coordinates *point = malloc(sizeof(struct Coordinates) * 2);
 		struct Vector *add = malloc(sizeof(struct Vector));
 
-		if (scan_coordinates(in, point) != 2) {
-			fputs("Incorrect format of coordinates.", stderr);
-			error();
-		}
+		if (scan_coordinates(in, point) != 2)
+			error("Incorrect format of coordinates.");
 
 		for (i = 1; ((count = scan_vector(in, add)) == 2); i++) {
 			start_print(writeout, i);
@@ -239,10 +223,8 @@ int main(int argc, char **argv)
 
 		free(point);
 		free(add);
-		if (count != -1) {
-			fputs("Incorrect format of vector.", stderr);
-			error();
-		}
+		if (count != -1)
+			error("Incorrect format of vector.");
 
 		break;
 		}
@@ -250,28 +232,26 @@ int main(int argc, char **argv)
 		case 3:
 		{
 		struct Coordinates *vertex = malloc(sizeof(struct Coordinates));
-		long double gexcess = 0;
-		long double area;
+		long double area, perimeter;
 
 		int pole = 0;
 		i = 0;
 
 		while ((count = scan_coordinates(in, vertex + i)) == 2)
 			vertex = realloc(vertex, sizeof(struct Coordinates) * (++i + 1));
-		if (count != -1) {
-			fputs("Incorrect format of coordinates.", stderr);
-			error();
-		}
-		if (memcmp(vertex + --i, vertex, sizeof(struct Coordinates)) != 0) {
-			fputs("Not a closed polygon.", stderr);
-			error();
-		}
+		if (count != -1)
+			error("Incorrect format of coordinates.");
+		if (memcmp(vertex + --i, vertex, sizeof(struct Coordinates)) != 0)
+			error("Not a closed polygon.");
 
 		start_print(writeout, 1);
 		switch (j)
 		{
 			case 1:
-			area = greatcircle_area(vertex, i);
+			if (azimuth == 1)
+				area = greatcircle_area(vertex, i);
+			if (distance == 1)
+				perimeter = greatcircle_perimeter(vertex, i);
 			break;
 			case 2:
 			break;
@@ -279,14 +259,21 @@ int main(int argc, char **argv)
 
 		free(vertex);
 
-		sprintf(writeout, "%s    \"area\": %.*LF\n  }", writeout, precision, area);
+		if (azimuth == 1) {
+			sprintf(writeout, "%s    \"area\": %.*LF", writeout, precision, area);
+			if (distance == 1)
+				strcat(writeout, ",\n");
+			else
+				strcat(writeout, "\n  }");
+		}
+		if (distance == 1)
+			sprintf(writeout, "%s    \"perimeter\": %.*LF\n  }", writeout, precision, perimeter);
 		fputs(writeout, out);
 		break;
 		}
 
 		default:
-		fputs("No problem defined.", stderr);
-		error();
+		error("No problem defined.");
 		break;
 	}
 

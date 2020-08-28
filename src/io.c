@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <strings.h>
 #include "geodesic.h"
 #include "io.h"
 
@@ -9,7 +10,7 @@ int scan_coordinates(FILE *in, struct Coordinates *loc)
 
 	if (count == 2 && (loc->lat < -90 || loc->lat > 90 || loc->lon < -180 || loc->lon > 180)) {
 		fprintf(stderr, "Coordinate out of range: %LF, %LF.\n", loc->lat, loc->lon);
-		error();
+		error(NULL);
 	}
 
 	loc->lat = loc->lat * RAD;
@@ -24,7 +25,7 @@ int scan_vector(FILE *in, struct Vector *vector)
 
 	if (count == 2 && (vector->theta < 0 || vector->theta > 360)) {
 		fprintf(stderr, "Bearing out of range: %LF.", vector->theta);
-		error();
+		error(NULL);
 	}
 
 	vector->theta = vector->theta * RAD;
@@ -39,15 +40,17 @@ void start_print(char *out, int i)
 	else
 		*out = ',';
 
-	sprintf(out, "%s\n  {\n", out);
+	strcat(out, "\n  {\n");
 
 	if (i % 10000 == 0)
 		fprintf(stderr, "%d values processed.\n", i);
 	return;
 }
 
-void error()
+void error(char *msg)
 {
+	if (msg != NULL)
+		fputs(msg, stderr);
 	fputs("\nAbort.\n", stderr);
 	exit(1);
 }
