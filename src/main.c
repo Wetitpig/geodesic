@@ -9,6 +9,7 @@
 #include "haversine.h"
 #include "vincenty.h"
 #include "greatcircle.h"
+#include "sjoeberg.h"
 
 void help(char *name)
 {
@@ -254,6 +255,10 @@ int main(int argc, char **argv)
 				perimeter = greatcircle_perimeter(vertex, i);
 			break;
 			case 2:
+			if (azimuth == 1)
+				area = sjoeberg_area(vertex, i);
+			if (distance == 1)
+				perimeter = sjoeberg_perimeter(vertex, i);
 			break;
 		}
 

@@ -35,7 +35,6 @@ struct vincenty_result vincenty_inverse(struct Coordinates *location)
 	long double londiff, lambda, u1, u2;
 	long double ssig, csig, sig, salp, calp, cos2, c;
 	long double a, b, dsig, s;
-	long double start, end;
 	int i = 0;
 
 	long double oldvalue[2];
