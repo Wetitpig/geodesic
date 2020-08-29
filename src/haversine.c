@@ -34,7 +34,7 @@ struct Coordinates haversine_direct(struct Coordinates *point, struct Vector *ad
 
 	result.lat = sinl(point->lat) * cosl(delta) + cosl(point->lat) * sinl(delta) * cosl(add->theta);
 
-	x = cosl(delta) * sinl(point->lat) * result.lat;
+	x = cosl(delta) - sinl(point->lat) * result.lat;
 	result.lat = asinl(result.lat);
 	y = sinl(add->theta) * sinl(delta) * cosl(point->lat);
 	if (x == 0 && y == 0) {
