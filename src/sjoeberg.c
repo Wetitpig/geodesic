@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include "vincenty.h"
@@ -22,7 +21,7 @@ struct Coordinates z(struct Coordinates *vertex, struct Coordinates *vertex2, in
 long double combi(int n, int r)
 {
 	int nr = n - r;
-	int fac[3];
+	long fac[3];
 	fac[0] = 1;
 	fac[1] = 1;
 	fac[2] = 1;
@@ -39,7 +38,7 @@ long double combi(int n, int r)
 		fac[2] = fac[2] * nr;
 	while (--nr);
 
-	return n / (r * nr);
+	return fac[0] / (fac[1] * fac[2]);
 }
 
 long double E(long double z, int k, long double *c)
@@ -100,14 +99,13 @@ long double sjoeberg_area(struct Coordinates *vertex, int i)
 			prev = normalise_a(inter[1].end - M_PI);
 
 		excess += normalise_a(next - prev);
-		fprintf(stderr, "%LF\n", excess);
 
 		for (k = 1; k < 11; k++) {
 			interarea = powl(ECC, k) * (k + 1) / (2 * k + 1);
 			zres = z(vertex + h, vertex + ((h + 1) % i), k, c);
 			z0 = zres.lat;
 			z1 = zres.lon;
-			interarea = interarea * (E(z0, k, c) - E(z1, k, c));
+			interarea = interarea * (E(z1, k, c) - E(z0, k, c));
 			darea = interarea + darea;
 		}
 
