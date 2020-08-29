@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include "vincenty.h"
@@ -21,29 +20,21 @@ struct Coordinates z(struct Coordinates *vertex, struct Coordinates *vertex2, in
 int combi(int n, int r)
 {
 	int nr;
-	int fac[3];
+	int fac[2];
 	fac[0] = 1;
 	fac[1] = 1;
-	fac[2] = 1;
 
 	if (n != r) {
 		nr = n - r;
 		do
-			fac[2] = fac[2] * nr;
+			fac[1] = fac[1] * nr;
 		while (--nr);
 	}
 
-	do
-		fac[0] = fac[0] * n;
-	while (--n);
+	while (n > r)
+		fac[0] = fac[0] * n--;
 
-	if (r != 0) {
-		do
-			fac[1] = fac[1] * r;
-		while (--r);
-	}
-
-	return fac[0] / (fac[1] * fac[2]);
+	return fac[0] / fac[1];
 }
 
 long double E(long double z, int k, long double *c)
