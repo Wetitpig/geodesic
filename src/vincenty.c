@@ -113,7 +113,7 @@ struct vincenty_result vincenty_inverse(struct Coordinates *location, struct Coo
 	dsig = b * ssig * (cos2 + b / 4 * (csig * (2 * sqr(cos2) - 1) - b / 6 * cos2 * (4 * sqr(ssig) - 3) * (4 * sqr(cos2) - 3)));
 	s = RAD_MIN * a * (sig - dsig);
 
-	if (fabsl(oldvalue[0] - salp) > fabsl(oldvalue[0] - lambda)) {
+	if (fabsl(oldvalue[0] - salp) >= fabsl(oldvalue[0] - lambda)) {
 		a = cosl(u2) * sinl(lambda);
 		b = cosl(u1) * sinl(u2) - sinl(u1) * cosl(u2) * cosl(lambda);
 
