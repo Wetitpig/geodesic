@@ -18,10 +18,10 @@ struct Coordinates z(struct Coordinates *vertex, struct Coordinates *vertex2, in
 	return z;
 }
 
-long combi(int n, int r)
+int combi(int n, int r)
 {
 	int nr;
-	long fac[3];
+	int fac[3];
 	fac[0] = 1;
 	fac[1] = 1;
 	fac[2] = 1;
@@ -135,7 +135,7 @@ struct Vector sjoeberg(struct Coordinates *vertex, int i, int s, int a)
 
 	free(c);
 
-	excess = fabsl(excess) - (i - 2) * M_PI;
+	excess = excess - (i - 2) * M_PI;
 	area = sqr(RAD_MIN) * (excess + darea);
 
 	struct Vector res;

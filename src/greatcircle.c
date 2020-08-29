@@ -13,9 +13,9 @@ long double greatcircle_area(struct Coordinates *vertex, int i)
 		excess += normalise_a(next - prev);
 	}
 
-	excess = fabsl(excess) - (i - 2) * M_PI;
+	excess = excess - (i - 2) * M_PI;
 
-	return fabsl(sqr(RADIUS) * excess);	
+	return fabsl(sqr(RADIUS) * excess);
 }
 
 long double greatcircle_perimeter(struct Coordinates *vertex, int i)

@@ -238,7 +238,6 @@ int main(int argc, char **argv)
 		long double area, perimeter;
 		struct Vector sj;
 
-		int pole = 0;
 		i = 0;
 
 		while ((count = scan_coordinates(in, vertex + i)) == 2)
@@ -248,19 +247,25 @@ int main(int argc, char **argv)
 		if (memcmp(vertex + --i, vertex, sizeof(struct Coordinates)) != 0)
 			error("Not a closed polygon.");
 
-		switch (j)
-		{
-			case 1:
-			if (azimuth == 1)
-				area = greatcircle_area(vertex, i);
-			if (distance == 1)
-				perimeter = greatcircle_perimeter(vertex, i);
-			break;
-			case 2:
+		if (i > 1) {
+			switch (j)
+			{
+				case 1:
+				if (azimuth == 1)
+					area = greatcircle_area(vertex, i);
+				if (distance == 1)
+					perimeter = greatcircle_perimeter(vertex, i);
+				break;
+				case 2:
 				sj = sjoeberg(vertex, i, distance, azimuth);
 				perimeter = sj.s;
 				area = sj.theta;
-			break;
+				break;
+			}
+		}
+		else {
+			area = 0;
+			perimeter = 0;
 		}
 
 		free(vertex);
