@@ -125,6 +125,8 @@ each coordinate is in the form of `latitude,longitude` in decimals.
 
 Coordinates of a polygon should be specified in the **counter-clockwise** direction.
 
+For polygons that include the poles, coordinates should be specified in the **eastward** direction for the North Pole, and the **westward** direction for the South Pole.
+
 Note that `coordinate1` must be placed at the end to close the polygon.
 
 #### Output
