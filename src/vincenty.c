@@ -30,7 +30,7 @@ static inline long double Cfromcalp(long double calp)
 	return FLAT / 16 * calp * (4 + FLAT * (4 - 3 * calp));
 }
 
-struct vincenty_result vincenty_inverse(struct Coordinates *location)
+struct vincenty_result vincenty_inverse(struct Coordinates *location, struct Coordinates *location2)
 {
 	long double londiff, lambda, u1, u2;
 	long double ssig, csig, sig, salp, calp, cos2, c;
@@ -44,11 +44,11 @@ struct vincenty_result vincenty_inverse(struct Coordinates *location)
 
 	long double d = 0;
 
-	londiff = (location + 1)->lon - location->lon;
+	londiff = location2->lon - location->lon;
 	lambda = londiff;
 
 	u1 = reduced_latitude(location->lat);
-	u2 = reduced_latitude((location + 1)->lat);
+	u2 = reduced_latitude(location2->lat);
 
 	do {
 		oldvalue[1] = oldvalue[0];

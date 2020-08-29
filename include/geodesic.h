@@ -11,6 +11,7 @@
 #define RAD_MIN 6356.752314245
 
 #define FLAT 1/298.257223563
+#define ECC 0.00669437999014
 
 struct Coordinates {
 	long double lat;

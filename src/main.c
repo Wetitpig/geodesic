@@ -139,7 +139,7 @@ int main(int argc, char **argv)
 				}
 				break;
 				case 2:
-				res = vincenty_inverse(location);
+				res = vincenty_inverse(location, location + 1);
 				c = res.distance;
 				start = res.start;
 				end = res.end;

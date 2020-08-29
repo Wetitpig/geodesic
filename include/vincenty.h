@@ -10,7 +10,9 @@ struct vincenty_result {
 	long double end;
 };
 
-struct vincenty_result vincenty_inverse(struct Coordinates *location);
+long double reduced_latitude(long double lat);
+
+struct vincenty_result vincenty_inverse(struct Coordinates *location, struct Coordinates *location2);
 struct vincenty_result vincenty_direct(struct Coordinates *point, struct Vector *add);
 
 #endif
