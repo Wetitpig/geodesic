@@ -129,12 +129,10 @@ Note that `coordinate1` must be placed at the end to close the polygon.
 
 #### Output
 ```
-[
-  {
-    "perimeter": xxx,
-    "area": xxx
-  }
-]
+{
+  "perimeter": xxx,
+  "area": xxx
+}
 ```
 Where
 * `perimeter` denotes the perimeter of the polygon.
