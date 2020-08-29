@@ -90,54 +90,56 @@ long double E(long double z, int k, long double *c)
 	return hsum / 2;
 }
 
-long double sjoeberg_area(struct Coordinates *vertex, int i)
+struct Vector sjoeberg(struct Coordinates *vertex, int i, int s, int a)
 {
+	struct vincenty_result inter[2];
+
 	long double prev, next, excess = 0;
 	long double area, darea = 0, interarea;
-	struct vincenty_result inter[2];
 	struct Coordinates zres;
 	long double z0, z1;
 	long double *c = malloc(sizeof(long double));
 
+	long double perimeter = 0;
+
 	int h, k;
 	for (h = 0; h < i; h++) {
 		inter[0] = vincenty_inverse(vertex + h, vertex + ((h + 1) % i));
-		next = inter[0].start;
-		if (h == 0) {
-			inter[1] = vincenty_inverse(vertex, vertex + i - 1);
-			prev = inter[1].start;
+
+		if (s == 1)
+			perimeter += inter[0].distance;
+
+		if (a == 1) {
+			next = inter[0].start;
+			if (h == 0) {
+				inter[1] = vincenty_inverse(vertex, vertex + i - 1);
+				prev = inter[1].start;
+			}
+			else
+				prev = normalise_a(inter[1].end - M_PI);
+
+			excess += normalise_a(next - prev);
+
+			for (k = 1; k < 6; k++) {
+				interarea = powl(ECC, k) * (k + 1) / (2 * k + 1);
+				zres = z(vertex + h, vertex + ((h + 1) % i), k, c);
+				z0 = zres.lat;
+				z1 = zres.lon;
+				interarea = interarea * (E(z1, k, c) - E(z0, k, c));
+				darea = interarea + darea;
+			}
+
+			inter[1] = inter[0];
 		}
-		else
-			prev = normalise_a(inter[1].end - M_PI);
-
-		excess += normalise_a(next - prev);
-
-		for (k = 1; k < 6; k++) {
-			interarea = powl(ECC, k) * (k + 1) / (2 * k + 1);
-			zres = z(vertex + h, vertex + ((h + 1) % i), k, c);
-			z0 = zres.lat;
-			z1 = zres.lon;
-			interarea = interarea * (E(z1, k, c) - E(z0, k, c));
-			darea = interarea + darea;
-		}
-
-		inter[1] = inter[0];
 	}
 
 	free(c);
 
 	excess = fabsl(excess) - (i - 2) * M_PI;
-	return sqr(RAD_MIN) * (excess + darea);
-}
+	area = sqr(RAD_MIN) * (excess + darea);
 
-long double sjoeberg_perimeter(struct Coordinates *vertex, int i)
-{
-	struct vincenty_result inter;
-	int k;
-	long double perimeter = 0;
-	for (k = 0; k < i; k++) {
-		inter = vincenty_inverse(vertex + k, vertex + ((k + 1) % i));
-		perimeter += inter.distance;
-	}
-	return perimeter;
+	struct Vector res;
+	res.s = perimeter;
+	res.theta = area;
+	return res;
 }

@@ -236,6 +236,7 @@ int main(int argc, char **argv)
 		{
 		struct Coordinates *vertex = malloc(sizeof(struct Coordinates));
 		long double area, perimeter;
+		struct Vector sj;
 
 		int pole = 0;
 		i = 0;
@@ -247,7 +248,6 @@ int main(int argc, char **argv)
 		if (memcmp(vertex + --i, vertex, sizeof(struct Coordinates)) != 0)
 			error("Not a closed polygon.");
 
-		start_print(writeout, 1);
 		switch (j)
 		{
 			case 1:
@@ -257,24 +257,24 @@ int main(int argc, char **argv)
 				perimeter = greatcircle_perimeter(vertex, i);
 			break;
 			case 2:
-			if (azimuth == 1)
-				area = sjoeberg_area(vertex, i);
-			if (distance == 1)
-				perimeter = sjoeberg_perimeter(vertex, i);
+				sj = sjoeberg(vertex, i, distance, azimuth);
+				perimeter = sj.s;
+				area = sj.theta;
 			break;
 		}
 
 		free(vertex);
 
+		memcpy(writeout, "{\n", 2);
 		if (azimuth == 1) {
-			sprintf(writeout, "%s    \"area\": %.*LF", writeout, precision, area);
+			sprintf(writeout, "%s  \"area\": %.*LF", writeout, precision, area);
 			if (distance == 1)
 				strcat(writeout, ",\n");
 			else
-				strcat(writeout, "\n  }");
+				strcat(writeout, "\n}\n");
 		}
 		if (distance == 1)
-			sprintf(writeout, "%s    \"perimeter\": %.*LF\n  }", writeout, precision, perimeter);
+			sprintf(writeout, "%s  \"perimeter\": %.*LF\n}\n", writeout, precision, perimeter);
 		fputs(writeout, out);
 		break;
 		}
@@ -288,9 +288,11 @@ int main(int argc, char **argv)
 	if (in != stdin)
 		fclose(in);
 
-	if (i == 1 && p < 3)
-		fputc('[', out);
-	fputs("\n]\n", out);
+	if (p < 3) {
+		if (i == 1)
+			fputc('[', out);
+		fputs("\n]\n", out);
+	}
 	if (out != stdout)
 		fclose(out);
 
