@@ -142,6 +142,7 @@ Where
 
 ### Units
 * All distances are provided in kilometres.
+* All areas are provided in square kilometres.
 * All angles are provided in degrees.
 * For latitudes, positive is assumed for north.
 * For longitudes, positive is assumed for east.
@@ -154,3 +155,4 @@ Where
 1. [Movable Type Scripts](https://www.movable-type.co.uk/scripts/latlong.html)
 2. [Vincenty's formulae @ Wikipedia](https://en.wikipedia.org/wiki/Vincenty%27s_formulae)
 3. [Geodetic Inverse Solution between Antinodal Points](https://geographiclib.sourceforge.io/geodesic-papers/vincenty75b.pdf)
+4. [Determination of areas on the plane, sphere and ellipsoid](https://www.tandfonline.com/doi/abs/10.1179/sre.2006.38.301.583?journalCode=ysre20)
