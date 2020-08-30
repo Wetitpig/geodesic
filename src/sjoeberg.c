@@ -3,20 +3,6 @@
 #include "vincenty.h"
 #include "sjoeberg.h"
 
-struct Coordinates z(struct Coordinates *vertex, struct Coordinates *vertex2, int k, long double *c)
-{
-	struct Coordinates z;
-
-	if (vertex->lat > vertex2->lat)
-		*c = cosl(reduced_latitude(vertex->lat));
-	else
-		*c = cosl(reduced_latitude(vertex2->lat));
-
-	z.lat = sqr(*c) * (1 - ECC) / sqr(cosl(vertex->lat));
-	z.lon = sqr(*c) * (1 - ECC) / sqr(cosl(vertex2->lat));
-	return z;
-}
-
 int combi(int n, int r)
 {
 	int nr;
@@ -24,12 +10,9 @@ int combi(int n, int r)
 	fac[0] = 1;
 	fac[1] = 1;
 
-	if (n != r) {
-		nr = n - r;
-		do
-			fac[1] = fac[1] * nr;
-		while (--nr);
-	}
+	nr = n - r;
+	while (nr)
+		fac[1] = fac[1] * nr--;
 
 	while (n > r)
 		fac[0] = fac[0] * n--;
@@ -37,19 +20,19 @@ int combi(int n, int r)
 	return fac[0] / fac[1];
 }
 
-long double E(long double z, int k, long double *c)
+long double E(struct Coordinates *vertex, int k, long double c)
 {
 	int j;
-	long double hsum = 0, h, p, f, S, h0;
+	long double hsum = 0, z, p, f, S, h0;
 	long double feval[k + 1];
 
-	p = ECC * sqr(*c);
-	f = (1 - p) * p;
-	p = 1 - 2 * p;
+	z = sqr(c) * (1 - ECC) / sqr(cosl(vertex->lat));
+	p = 1 - 2 * ECC * sqr(c);
+	f = (1 - ECC * sqr(c)) * ECC * sqr(c);
 	S = f + p * z - sqr(z);
 	if (S < 0)
 		S = 0;
-	h0 = sqr(*c) * (1 - ECC);
+	h0 = sqr(c) * (1 - ECC);
 
 	for (j = 0; j <= k; j++) {
 		switch(j)
@@ -68,14 +51,13 @@ long double E(long double z, int k, long double *c)
 			break;
 
 			default:
-			feval[j] = -sqrtl(S) / ((j - 1) * f * powl(z, (j - 1)));
-			feval[j] = feval[j] - p * (2 * j - 3) / (2 * (j - 1) * f) * feval[j - 1];
-			feval[j] = feval[j] + (j - 2) / ((j - 1) * f) * feval[j - 2];
+			j--;
+			feval[j + 1] = - sqrtl(S) / (j * f * powl(z, j)) - p * (2 * j - 1) / (2 * j * f) * feval[j] + (j - 1) / (j * f) * feval[j - 1];
+			j++;
 			break;
 		}
 
-		h = powl(-h0, j) * combi(k, j) * feval[j];
-		hsum = hsum + h;
+		hsum = hsum + powl(-h0, j) * combi(k, j) * feval[j];
 	}
 
 	return hsum / 2;
@@ -87,9 +69,7 @@ struct Vector sjoeberg(struct Coordinates *vertex, int i, int s, int a)
 
 	long double prev, next, excess = 0;
 	long double area, darea = 0, interarea;
-	struct Coordinates zres;
-	long double z0, z1;
-	long double *c = malloc(sizeof(long double));
+	long double c, c2;
 
 	long double perimeter = 0;
 
@@ -111,20 +91,21 @@ struct Vector sjoeberg(struct Coordinates *vertex, int i, int s, int a)
 
 			excess += normalise_a(next - prev);
 
-			for (k = 1; k < 6; k++) {
-				interarea = powl(ECC, k) * (k + 1) / (2 * k + 1);
-				zres = z(vertex + h, vertex + ((h + 1) % i), k, c);
-				z0 = zres.lat;
-				z1 = zres.lon;
-				interarea = interarea * (E(z1, k, c) - E(z0, k, c));
-				darea = interarea + darea;
+			if ((vertex + h)->lon != (vertex + ((h + 1) % i))->lon && fabsl((vertex + h)->lat) != M_PI_2 && fabsl((vertex + ((h + 1) % i))->lat) != M_PI_2) {
+				for (k = 1; k < 6; k++) {
+					interarea = powl(ECC, k) * (k + 1) / (2 * k + 1);
+					c = cosl(reduced_latitude((vertex + h)->lat)) * sinl(inter[0].start);
+					c = c + cosl(reduced_latitude((vertex + ((h + 1) % i))->lat)) * sinl(inter[0].end);
+					c = c / 2;
+
+					interarea = interarea * (E(vertex + h, k, c) - E(vertex + ((h + 1) % i), k, c));
+					darea = interarea + darea;
+				}
 			}
 
 			inter[1] = inter[0];
 		}
 	}
-
-	free(c);
 
 	excess = excess - (i - 2) * M_PI;
 	area = sqr(RAD_MIN) * (excess + darea);
