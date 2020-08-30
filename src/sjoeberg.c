@@ -3,6 +3,8 @@
 #include "vincenty.h"
 #include "sjoeberg.h"
 
+#define E2C2 ECC * sqr(c)
+
 int binom(int n, int r)
 {
 	int nr;
@@ -27,8 +29,8 @@ long double E(struct Coordinates *vertex, int k, long double c)
 	long double feval[k + 1];
 
 	z = sqr(c) * (1 - ECC) / sqr(cosl(vertex->lat));
-	p = 1 - 2 * ECC * sqr(c);
-	f = (1 - ECC * sqr(c)) * ECC * sqr(c);
+	p = 1 - 2 * E2C2;
+	f = (1 - E2C2) * E2C2;
 	S = f + p * z - sqr(z);
 	if (S < 0)
 		S = 0;
@@ -47,7 +49,7 @@ long double E(struct Coordinates *vertex, int k, long double c)
 			break;
 
 			case 1:
-			feval[1] = logl((2 * f + p * z - sqrtl(f * S)) / z) / sqrtl(f);
+			feval[1] = logl((2 * f + p * z - 2 * sqrtl(f * S)) / z) / sqrtl(f);
 			break;
 
 			default:
@@ -98,11 +100,13 @@ struct Vector sjoeberg(struct Coordinates *vertex, int i, int s, int a)
 					c = c + cosl(reduced_latitude((vertex + ((h + 1) % i))->lat)) * sinl(inter[0].end);
 					c = c / 2;
 
-					interarea = interarea * (E(vertex + h, k, c) - E(vertex + ((h + 1) % i), k, c));
+					if ((vertex + h)->lon < (vertex + ((h + 1) % i))->lon)
+						interarea = interarea * (E(vertex + h, k, c) - E(vertex + ((h + 1) % i), k, c));
+					else
+						interarea = interarea * (E(vertex + ((h + 1) % i), k, c) - E(vertex + h, k, c));
 					darea = interarea + darea;
 				}
 			}
-
 			inter[1] = inter[0];
 		}
 	}
