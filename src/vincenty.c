@@ -54,7 +54,7 @@ struct vincenty_result vincenty_inverse(struct Coordinates *location, struct Coo
 		oldvalue[1] = oldvalue[0];
 		oldvalue[0] = lambda;
 
-		ssig = sqrtl(sqr(cosl(u2) * sinl(lambda)) + sqr(cosl(u1) * sinl(u2) - sinl(u1) * cosl(u2) * cosl(lambda)));
+		ssig = hypotl(cosl(u2) * sinl(lambda), cosl(u1) * sinl(u2) - sinl(u1) * cosl(u2) * cosl(lambda));
 		csig = sinl(u1) * sinl(u2) + cosl(u1) * cosl(u2) * cosl(lambda);
 
 		sig = atan2_modified(ssig, csig);
@@ -163,7 +163,7 @@ struct vincenty_result vincenty_direct(struct Coordinates *point, struct Vector 
 	} while (fabsl(oldvalue - sigma) >= powl(10, -15));
 
 	struct vincenty_result result;
-	result.distance = atan2_modified(sinl(u1) * cosl(sigma) + cosl(u1) * sinl(sigma) * cosl(add->theta), (1 - FLAT) * sqrtl(sqr(salp) + sqr(sinl(u1) * sinl(sigma) - cosl(u1) * cosl(sigma) * cosl(add->theta))));
+	result.distance = atan2_modified(sinl(u1) * cosl(sigma) + cosl(u1) * sinl(sigma) * cosl(add->theta), (1 - FLAT) * hypotl(salp, sinl(u1) * sinl(sigma) - cosl(u1) * cosl(sigma) * cosl(add->theta)));
 	lambda = atan2_modified(sinl(sigma) * sinl(add->theta), cosl(u1) * cosl(sigma) - sinl(u1) * sinl(sigma) * cosl(add->theta));
 
 	c = Cfromcalp(1 - sqr(salp));

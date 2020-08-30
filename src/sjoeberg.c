@@ -3,7 +3,7 @@
 #include "vincenty.h"
 #include "sjoeberg.h"
 
-int combi(int n, int r)
+int binom(int n, int r)
 {
 	int nr;
 	int fac[2];
@@ -57,7 +57,7 @@ long double E(struct Coordinates *vertex, int k, long double c)
 			break;
 		}
 
-		hsum = hsum + powl(-h0, j) * combi(k, j) * feval[j];
+		hsum = hsum + powl(-h0, j) * binom(k, j) * feval[j];
 	}
 
 	return hsum / 2;
