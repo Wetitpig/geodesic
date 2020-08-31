@@ -95,9 +95,9 @@ long double ellipblock(struct Coordinates *vertex)
 
 	long double londiff = lon[1] - lon[0];
 	long double slat = sinl(lat[1]);
-	long double latdiff = slat / (2 * (1 - ECC * slat)) + logl((1 + sqrtl(ECC) * slat) / (1 - sqrtl(ECC) * slat)) / (4 * sqrtl(ECC));
+	long double latdiff = slat / (2 * (1 - ECC * sqr(slat))) + logl((1 + sqrtl(ECC) * slat) / (1 - sqrtl(ECC) * slat)) / (4 * sqrtl(ECC));
 	slat = sinl(lat[0]);
-	latdiff -= slat / (2 * (1 - ECC * slat)) + logl((1 + sqrtl(ECC) * slat) / (1 - sqrtl(ECC) * slat)) / (4 * sqrtl(ECC));
+	latdiff -= slat / (2 * (1 - ECC * sqr(slat))) + logl((1 + sqrtl(ECC) * slat) / (1 - sqrtl(ECC) * slat)) / (4 * sqrtl(ECC));
 
 	return sqr(RAD_MIN) * londiff * latdiff;
 }
