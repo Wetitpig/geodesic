@@ -73,6 +73,16 @@ int isblock(struct Coordinates *vertex)
 	return block;
 }
 
+int ispolariso(struct Coordinates *vertex)
+{
+	int k;
+	for (k = 0; k < 3; k++) {
+		if (fabsl((vertex + k)->lat) / RAD == 90 && (vertex + (k + 1) % 3)->lat == (vertex + (k + 2) % 3)->lat)
+			break;
+	}
+	return k;
+}
+
 long double ellipblock(struct Coordinates *vertex)
 {
 	long double lat[2], lon[2];
@@ -117,6 +127,21 @@ struct Vector sjoeberg(struct Coordinates *vertex, int i, int s, int a)
 	if (a == 1) {
 		if (i == 4 && isblock(vertex)) {
 			area = ellipblock(vertex);
+			a = 0;
+		}
+		else if (i == 3 && (k = ispolariso(vertex)) < 3) {
+			struct Coordinates *triangle = malloc(sizeof(struct Coordinates) * 4);
+
+			triangle->lat = (vertex + k)->lat;
+			for (h = 1; h < 4; h++)
+				(triangle + h)->lat = (vertex + ((k + h) % 3))->lat;
+			triangle->lon = (vertex + ((k + 2) % 3))->lon;
+			(triangle + 1)->lon = (vertex + ((k + 1) % 3))->lon;
+			(triangle + 2)->lon = (triangle + 1)->lon;
+			(triangle + 3)->lon = triangle->lon;
+
+			area = ellipblock(triangle);
+			free(triangle);
 			a = 0;
 		}
 	}
