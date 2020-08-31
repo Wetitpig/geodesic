@@ -65,17 +65,62 @@ long double E(struct Coordinates *vertex, int k, long double c)
 	return hsum / 2;
 }
 
+long double ellipblock(struct Coordinates *vertex)
+{
+	if (vertex->lat != (vertex + 1)->lat || (vertex + 2)->lat != (vertex + 3)->lat)
+		return 0;
+
+	if ((vertex + 1)->lon != (vertex + 2)->lon || (vertex + 3)->lon != vertex->lon)
+		return 0;
+
+
+	long double lat[2], lon[2];
+	if (vertex->lat < (vertex + 2)->lat) {
+		lat[0] = vertex->lat;
+		lat[1] = (vertex + 2)->lat;
+	}
+	else {
+		lat[0] = (vertex + 2)->lat;
+		lat[1] = vertex->lat;
+	}
+
+	if (vertex->lon < (vertex + 2)->lon) {
+		lon[0] = vertex->lon;
+		lon[1] = (vertex + 2)->lon;
+	}
+	else {
+		lon[0] = (vertex + 2)->lon;
+		lon[1] = vertex->lon;
+	}
+
+	long double londiff = lon[1] - lon[0];
+	long double slat = sinl(lat[1]);
+	long double latdiff = slat / (2 * (1 - ECC * slat)) + logl((1 + sqrtl(ECC) * slat) / (1 - sqrtl(ECC) * slat)) / (4 * sqrtl(ECC));
+	slat = sinl(lat[0]);
+	latdiff -= slat / (2 * (1 - ECC * slat)) + logl((1 + sqrtl(ECC) * slat) / (1 - sqrtl(ECC) * slat)) / (4 * sqrtl(ECC));
+
+	return sqr(RAD_MIN) * londiff * latdiff;
+}
+
 struct Vector sjoeberg(struct Coordinates *vertex, int i, int s, int a)
 {
 	struct vincenty_result inter[2];
 
 	long double prev, next, excess = 0;
-	long double area, darea = 0, interarea;
-	long double c, c2;
+	long double area, darea = 0;
 
 	long double perimeter = 0;
 
 	int h, k;
+
+	if (a == 1) {
+		if (i == 4) {
+			area = ellipblock(vertex);
+			if (area != 0)
+				a = 0;
+		}
+	}
+
 	for (h = 0; h < i; h++) {
 		inter[0] = vincenty_inverse(vertex + h, vertex + ((h + 1) % i));
 
@@ -94,6 +139,7 @@ struct Vector sjoeberg(struct Coordinates *vertex, int i, int s, int a)
 			excess += normalise_a(next - prev);
 
 			if ((vertex + h)->lon != (vertex + ((h + 1) % i))->lon && fabsl((vertex + h)->lat) != M_PI_2 && fabsl((vertex + ((h + 1) % i))->lat) != M_PI_2) {
+				long double c, interarea;
 				for (k = 1; k < 6; k++) {
 					interarea = powl(ECC, k) * (k + 1) / (2 * k + 1);
 					c = cosl(reduced_latitude((vertex + h)->lat)) * sinl(inter[0].start);
@@ -107,12 +153,15 @@ struct Vector sjoeberg(struct Coordinates *vertex, int i, int s, int a)
 					darea = interarea + darea;
 				}
 			}
+
 			inter[1] = inter[0];
 		}
 	}
 
-	excess = excess - (i - 2) * M_PI;
-	area = sqr(RAD_MIN) * (excess + darea);
+	if (a == 1) {
+		excess = excess - (i - 2) * M_PI;
+		area = sqr(RAD_MIN) * (excess + darea);
+	}
 
 	struct Vector res;
 	res.s = perimeter;
