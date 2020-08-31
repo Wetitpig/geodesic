@@ -65,15 +65,16 @@ long double E(struct Coordinates *vertex, int k, long double c)
 	return hsum / 2;
 }
 
+int isblock(struct Coordinates *vertex)
+{
+	int block = 1;
+	block &= (vertex->lat == (vertex + 1)->lat && (vertex + 2)->lat == (vertex + 3)->lat && (vertex + 1)->lon == (vertex + 2)->lon && vertex->lon == (vertex + 3)->lon);
+	block |= (vertex->lon == (vertex + 1)->lon && (vertex + 2)->lon == (vertex + 3)->lon && (vertex + 1)->lat == (vertex + 2)->lat && vertex->lat == (vertex + 3)->lat);
+	return block;
+}
+
 long double ellipblock(struct Coordinates *vertex)
 {
-	if (vertex->lat != (vertex + 1)->lat || (vertex + 2)->lat != (vertex + 3)->lat)
-		return 0;
-
-	if ((vertex + 1)->lon != (vertex + 2)->lon || (vertex + 3)->lon != vertex->lon)
-		return 0;
-
-
 	long double lat[2], lon[2];
 	if (vertex->lat < (vertex + 2)->lat) {
 		lat[0] = vertex->lat;
@@ -114,10 +115,9 @@ struct Vector sjoeberg(struct Coordinates *vertex, int i, int s, int a)
 	int h, k;
 
 	if (a == 1) {
-		if (i == 4) {
+		if (i == 4 && isblock(vertex)) {
 			area = ellipblock(vertex);
-			if (area != 0)
-				a = 0;
+			a = 0;
 		}
 	}
 
