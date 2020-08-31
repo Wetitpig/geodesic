@@ -14,10 +14,10 @@ int binom(int n, int r)
 
 	nr = n - r;
 	while (nr)
-		fac[1] = fac[1] * nr--;
+		fac[1] *= nr--;
 
 	while (n > r)
-		fac[0] = fac[0] * n--;
+		fac[0] *= n--;
 
 	return fac[0] / fac[1];
 }
@@ -28,7 +28,7 @@ long double E(struct Coordinates *vertex, int k, long double c)
 	long double hsum = 0, z, p, f, S, h0;
 	long double feval[k + 1];
 
-	z = sqr(c) * (1 - ECC) / sqr(cosl(vertex->lat));
+	z = sqr(c / cosl(vertex->lat)) * (1 - ECC);
 	p = 1 - 2 * E2C2;
 	f = (1 - E2C2) * E2C2;
 	S = f + p * z - sqr(z);
@@ -49,17 +49,18 @@ long double E(struct Coordinates *vertex, int k, long double c)
 			break;
 
 			case 1:
-			feval[1] = logl((2 * f + p * z - 2 * sqrtl(f * S)) / z) / sqrtl(f);
+			feval[1] = logl(2 * (f - sqrtl(f * S)) / z + p) / sqrtl(f);
 			break;
 
 			default:
 			j--;
-			feval[j + 1] = - sqrtl(S) / (j * f * powl(z, j)) - p * (2 * j - 1) / (2 * j * f) * feval[j] + (j - 1) / (j * f) * feval[j - 1];
+			feval[j + 1] = - sqrtl(S) / powl(z, j) - p * (2 * j - 1) / 2 * feval[j] + (j - 1) * feval[j - 1];
+			feval[j + 1] /= (j * f);
 			j++;
 			break;
 		}
 
-		hsum = hsum + powl(-h0, j) * binom(k, j) * feval[j];
+		hsum += powl(-h0, j) * feval[j] * binom(k, j);
 	}
 
 	return hsum / 2;
@@ -160,7 +161,6 @@ struct Vector sjoeberg(struct Coordinates *vertex, int i, int s, int a)
 			}
 			else
 				prev = normalise_a(inter[1].end - M_PI);
-
 			excess += normalise_a(next - prev);
 
 			if ((vertex + h)->lon != (vertex + ((h + 1) % i))->lon && fabsl((vertex + h)->lat) != M_PI_2 && fabsl((vertex + ((h + 1) % i))->lat) != M_PI_2) {
@@ -172,10 +172,10 @@ struct Vector sjoeberg(struct Coordinates *vertex, int i, int s, int a)
 					c = c / 2;
 
 					if ((vertex + h)->lon < (vertex + ((h + 1) % i))->lon)
-						interarea = interarea * (E(vertex + h, k, c) - E(vertex + ((h + 1) % i), k, c));
+						interarea *= (E(vertex + h, k, c) - E(vertex + ((h + 1) % i), k, c));
 					else
-						interarea = interarea * (E(vertex + ((h + 1) % i), k, c) - E(vertex + h, k, c));
-					darea = interarea + darea;
+						interarea *= (E(vertex + ((h + 1) % i), k, c) - E(vertex + h, k, c));
+					darea += interarea;
 				}
 			}
 

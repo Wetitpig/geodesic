@@ -168,8 +168,7 @@ struct vincenty_result vincenty_direct(struct Coordinates *point, struct Vector 
 
 	c = Cfromcalp(1 - sqr(salp));
 	result.start = lambda - (1 - c) * FLAT * salp * (sigma + c * sinl(sigma) * (cosl(s2) + c * cosl(sigma) * (2 * sqr(cosl(s2)) - 1)));
-	result.start = result.start + point->lon;
-	result.start = normalise_c(result.start);
+	result.start = normalise_c(result.start + point->lon);
 
 	result.end = normalise_a(atan2_modified(salp, -sinl(u1) * sinl(sigma) + cosl(u1) * cosl(sigma) * cosl(add->theta)));
 
