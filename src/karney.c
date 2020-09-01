@@ -70,6 +70,7 @@ void karney(struct Coordinates *vertex, int i, int s, int a, long double *res)
 	long double *inter = malloc(sizeof(long double) * 8);
 	long double prev, next, excess = 0;
 	long double area, darea = 0, interarea;
+	long double csig0, csig1;
 
 	long double perimeter = 0;
 
@@ -114,10 +115,9 @@ void karney(struct Coordinates *vertex, int i, int s, int a, long double *res)
 			excess += normalise_a(next - prev);
 
 			interarea = *(inter + 3) * sqrtl(1 - sqr(*(inter + 3)));
-			if ((vertex + h)->lon > (vertex + ((h + 1) % i))->lon)
-				interarea *= I4(atan2_modified(tan_reduced_latitude((vertex + h)->lat), cos(*(inter + 1))), *(inter + 3)) - I4(atan2_modified(tan_reduced_latitude((vertex + ((h + 1) % i))->lat), cos(*(inter + 2))), *(inter + 3));
-			else
-				interarea *= I4(atan2_modified(tan_reduced_latitude((vertex + ((h + 1) % i))->lat), cos(*(inter + 2))), *(inter + 3)) - I4(atan2_modified(tan_reduced_latitude((vertex + h)->lat), cos(*(inter + 1))), *(inter + 3));
+			csig1 = 1 / (hypotl(1, tan_reduced_latitude((vertex + ((h + 1) % i))->lat)) * hypotl(1, sqrtl(ECC2) * cosl((vertex + ((h + 1) % i))->lat)));
+			csig0 = 1 / (hypotl(1, tan_reduced_latitude((vertex + h)->lat)) * hypotl(1, sqrtl(ECC2) * cosl((vertex + h)->lat)));
+			interarea *= I4(acosl(csig1), *(inter + 3)) - I4(acosl(csig0), *(inter + 3));
 
 			darea += interarea;
 			memcpy(inter + 4, inter, sizeof(long double) * 4);
