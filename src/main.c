@@ -9,7 +9,7 @@
 #include "haversine.h"
 #include "vincenty.h"
 #include "greatcircle.h"
-#include "sjoeberg.h"
+#include "karney.h"
 
 void help(char *name)
 {
@@ -112,7 +112,7 @@ int main(int argc, char **argv)
 	if (j == 0)
 		error("No formula defined.");
 
-	struct vincenty_result res;
+	long double *res = malloc(sizeof(long double) * 3);
 	char *writeout = calloc(1024, sizeof(char));
 
 	switch (p)
@@ -139,10 +139,10 @@ int main(int argc, char **argv)
 				}
 				break;
 				case 2:
-				res = vincenty_inverse(location, location + 1);
-				c = res.distance;
-				start = res.start;
-				end = res.end;
+				vincenty_inverse(location, location + 1, res, 3);
+				c = *res;
+				start = *(res + 1);
+				end = *(res + 2);
 				break;
 			}
 
@@ -195,10 +195,10 @@ int main(int argc, char **argv)
 					end = normalise_a(haversine_bearing(point + 1, point) - M_PI);
 				break;
 				case 2:
-				res = vincenty_direct(point, add);
-				(point + 1)->lat = res.distance;
-				(point + 1)->lon = res.start;
-				end = res.end;
+				vincenty_direct(point, add, res);
+				(point + 1)->lat = *res;
+				(point + 1)->lon = *(res + 1);
+				end = *(res + 2);
 				break;
 			}
 
@@ -235,8 +235,7 @@ int main(int argc, char **argv)
 		case 3:
 		{
 		struct Coordinates *vertex = malloc(sizeof(struct Coordinates));
-		long double area, perimeter;
-		struct Vector sj;
+		long double area, perimeter, esterror;
 
 		i = 0;
 
@@ -257,9 +256,9 @@ int main(int argc, char **argv)
 					perimeter = greatcircle_perimeter(vertex, i);
 				break;
 				case 2:
-				sj = sjoeberg(vertex, i, distance, azimuth);
-				perimeter = sj.s;
-				area = sj.theta;
+				karney(vertex, i, distance, azimuth, res);
+				perimeter = *res;
+				area = *(res + 1);
 				break;
 			}
 		}
@@ -289,6 +288,7 @@ int main(int argc, char **argv)
 		break;
 	}
 
+	free(res);
 	free(writeout);
 	if (in != stdin)
 		fclose(in);

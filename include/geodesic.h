@@ -12,6 +12,7 @@
 
 #define FLAT 1/298.257223563
 #define ECC 0.00669437999014
+#define ECC2 0.00673949674228
 
 struct Coordinates {
 	long double lat;

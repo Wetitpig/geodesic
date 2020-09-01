@@ -4,15 +4,9 @@
 
 #define __HAVE_VINCENTY_H__
 
-struct vincenty_result {
-	long double distance;
-	long double start;
-	long double end;
-};
+long double tan_reduced_latitude(long double lat);
 
-long double reduced_latitude(long double lat);
-
-struct vincenty_result vincenty_inverse(struct Coordinates *location, struct Coordinates *location2);
-struct vincenty_result vincenty_direct(struct Coordinates *point, struct Vector *add);
+void vincenty_inverse(struct Coordinates *location, struct Coordinates *location2, long double *res, int count);
+void vincenty_direct(struct Coordinates *point, struct Vector *add, long double *res);
 
 #endif
