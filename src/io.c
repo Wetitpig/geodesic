@@ -35,12 +35,12 @@ int scan_vector(FILE *in, struct Vector *vector)
 
 void start_print(char *out, int i)
 {
-	if (i == 1)
+	if (i == 1) {
 		*out = '[';
-	else
+		strcat(out, "\n  {\n");
+	}
+	else if (i == 2)
 		*out = ',';
-
-	strcat(out, "\n  {\n");
 
 	if (i % 10000 == 0)
 		fprintf(stderr, "%d values processed.\n", i);

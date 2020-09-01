@@ -164,7 +164,7 @@ int main(int argc, char **argv)
 			memcpy(location, location + 1, sizeof(struct Coordinates));
 
 			fputs(writeout, out);
-			memset(writeout, 0, 1024);
+			memset(writeout + 6, 0, 1018);
 		}
 
 		free(location);
@@ -221,7 +221,7 @@ int main(int argc, char **argv)
 			memcpy(point, point + 1, sizeof(struct Coordinates));
 
 			fputs(writeout, out);
-			memset(writeout, 0, 1024);
+			memset(writeout + 6, 0, 1018);
 		}
 
 		free(point);
