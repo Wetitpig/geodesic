@@ -5,8 +5,6 @@
 #include "karney.h"
 #include "karney_lookup.h"
 
-#define E2C2 ECC * sqr(c)
-
 long double I4(long double sig, long double salp)
 {
 	long double i = 0, c = 0;
