@@ -8,7 +8,7 @@ long double greatcircle_area(struct Coordinates *vertex, int i)
 	long double next, prev, excess = 0;
 	int k;
 	for (k = 0; k < i; k++) {
-		next = haversine_bearing(vertex + k, vertex + ((k + 1) % i));
+		next = haversine_bearing(vertex + k, vertex + k + 1);
 		prev = haversine_bearing(vertex + k, vertex + ((k + i - 1) % i));
 		excess += normalise_a(next - prev);
 	}

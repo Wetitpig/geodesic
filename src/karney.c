@@ -99,7 +99,7 @@ void karney(struct Coordinates *vertex, int i, int s, int a, long double *res)
 	}
 
 	for (h = 0; h < i; h++) {
-		vincenty_inverse(vertex + h, vertex + ((h + 1) % i), inter, 4);
+		vincenty_inverse(vertex + h, vertex + h + 1, inter, 4);
 
 		if (s == 1)
 			perimeter += *inter;
@@ -115,7 +115,7 @@ void karney(struct Coordinates *vertex, int i, int s, int a, long double *res)
 			excess += normalise_a(next - prev);
 
 			interarea = *(inter + 3) * sqrtl(1 - sqr(*(inter + 3)));
-			csig1 = 1 / (hypotl(1, tan_reduced_latitude((vertex + ((h + 1) % i))->lat)) * hypotl(1, sqrtl(ECC2) * cosl((vertex + ((h + 1) % i))->lat)));
+			csig1 = 1 / (hypotl(1, tan_reduced_latitude((vertex + h + 1)->lat)) * hypotl(1, sqrtl(ECC2) * cosl((vertex + h + 1)->lat)));
 			csig0 = 1 / (hypotl(1, tan_reduced_latitude((vertex + h)->lat)) * hypotl(1, sqrtl(ECC2) * cosl((vertex + h)->lat)));
 			interarea *= I4(acosl(csig1), *(inter + 3)) - I4(acosl(csig0), *(inter + 3));
 
