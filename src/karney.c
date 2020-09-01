@@ -85,12 +85,12 @@ void karney(struct Coordinates *vertex, int i, int s, int a, long double *res)
 			struct Coordinates *triangle = malloc(sizeof(struct Coordinates) * 4);
 
 			triangle->lat = (vertex + k)->lat;
-			for (h = 1; h < 4; h++)
-				(triangle + h)->lat = (vertex + ((k + h) % 3))->lat;
 			triangle->lon = (vertex + ((k + 2) % 3))->lon;
-			(triangle + 1)->lon = (vertex + ((k + 1) % 3))->lon;
-			(triangle + 2)->lon = (triangle + 1)->lon;
-			(triangle + 3)->lon = triangle->lon;
+			memcpy(triangle + 1, vertex + ((k + 1) % 3), sizeof(struct Coordinates));
+			for (h = 2; h < 4; h++) {
+				(triangle + h)->lat = (vertex + ((k + h) % 3))->lat;
+				(triangle + h)->lon = (triangle + (3 - h))->lon;
+			}
 
 			area = ellipblock(triangle);
 			free(triangle);
