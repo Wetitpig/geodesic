@@ -156,3 +156,4 @@ Where
 2. [Vincenty's formulae @ Wikipedia](https://en.wikipedia.org/wiki/Vincenty%27s_formulae)
 3. [Geodetic Inverse Solution between Antinodal Points](https://geographiclib.sourceforge.io/geodesic-papers/vincenty75b.pdf)
 4. [Determination of areas on the plane, sphere and ellipsoid](https://www.tandfonline.com/doi/abs/10.1179/sre.2006.38.301.583?journalCode=ysre20)
+5. [Geodesics on an ellipsoid of revolution](https://arxiv.org/pdf/1102.1215.pdf)
