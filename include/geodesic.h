@@ -8,11 +8,11 @@
 #define RAD (M_PI / 180)
 
 #define RAD_MAJ 6378.137
-#define RAD_MIN 6356.752314245
+#define FLAT (1/298.257223563)
 
-#define FLAT 1/298.257223563
-#define ECC 0.00669437999014
-#define ECC2 0.00673949674228
+#define RAD_MIN (RAD_MAJ * (1 - FLAT))
+#define ECC (FLAT * (2 - FLAT))
+#define ECC2 (ECC / (1 - ECC))
 
 struct Coordinates {
 	long double lat;
