@@ -25,8 +25,8 @@ struct Coordinates helmert(long double calp)
 	usq = calp * (sqr(RAD_MAJ) / sqr(RAD_MIN) - 1);
 	k1 = sqrtl(1 + usq);
 	k1 = (k1 - 1) / (k1 + 1);
-	ab.lat = (1 + sqr(k1) / 4) / (1 - k1);
-	ab.lon = k1 * (1 - 3 / 8 * sqr(k1));
+	ab.lat = (25 * powl(k1, 8) / 16384 + powl(k1, 6) / 256 + powl(k1, 4) / 64 + sqr(k1) / 4 + 1) / (1 - k1);
+	ab.lon = k1 * (1 - 3 * sqr(k1) / 8);
 	return ab;
 }
 
