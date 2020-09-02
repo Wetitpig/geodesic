@@ -234,13 +234,17 @@ int main(int argc, char **argv)
 
 		case 3:
 		{
-		struct Coordinates *vertex = malloc(sizeof(struct Coordinates));
+		struct Coordinates *vertex = malloc(sizeof(struct Coordinates) * 64);
 		long double area, perimeter, esterror;
 
 		i = 0;
+		while ((count = scan_coordinates(in, vertex + i)) == 2) {
+			if (++i % 64 == 0)
+				vertex = realloc(vertex, sizeof(struct Coordinates) * (i + 64));
+		}
+		if (in != stdin)
+			fclose(in);
 
-		while ((count = scan_coordinates(in, vertex + i)) == 2)
-			vertex = realloc(vertex, sizeof(struct Coordinates) * (++i + 1));
 		if (count != -1)
 			error("Incorrect format of coordinates.");
 		if (memcmp(vertex + --i, vertex, sizeof(struct Coordinates)) != 0)
@@ -290,10 +294,11 @@ int main(int argc, char **argv)
 
 	free(res);
 	free(writeout);
-	if (in != stdin)
-		fclose(in);
 
 	if (p < 3) {
+		if (in != stdin)
+			fclose(in);
+
 		if (i == 1)
 			fputc('[', out);
 		fputs("\n]\n", out);
