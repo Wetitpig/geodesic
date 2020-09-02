@@ -4,7 +4,7 @@
 
 #define __HAVE_KARNEY_LOOKUP_H__
 
-long double Clookup[6][6] =
+const long double Clookup[6][6] =
 {
 {
 2/3 - ECC2/15 + 4*ECC2*ECC2/105 - 8*ECC2*ECC2*ECC2/315 + 64*ECC2*ECC2*ECC2*ECC2/3465 - 128*ECC2*ECC2*ECC2*ECC2*ECC2/9009,
