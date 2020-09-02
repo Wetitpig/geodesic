@@ -2,6 +2,8 @@
 #include "geodesic.h"
 #include "vincenty.h"
 
+const long double Alookup[5] = {25.0/16384, 1.0/256, 1.0/64, 1.0/4, 1};
+
 long double tan_reduced_latitude(long double lat)
 {
 	return (1 - FLAT) * tanl(lat);
@@ -20,12 +22,18 @@ long double reduced_latitude(long double lat)
 struct Coordinates helmert(long double calp)
 {
 	struct Coordinates ab;
+	ab.lat = 0;
 	long double usq, k1;
+	int k;
 
-	usq = calp * (sqr(RAD_MAJ) / sqr(RAD_MIN) - 1);
+	usq = calp * ECC2;
 	k1 = sqrtl(1 + usq);
 	k1 = (k1 - 1) / (k1 + 1);
-	ab.lat = (25 * powl(k1, 8) / 16384 + powl(k1, 6) / 256 + powl(k1, 4) / 64 + sqr(k1) / 4 + 1) / (1 - k1);
+	for (k = 0; k < 5; k++) {
+		ab.lat *= sqr(k1);
+		ab.lat += Alookup[k];
+	}
+	ab.lat /= (1 - k1);
 	ab.lon = k1 * (1 - 3 * sqr(k1) / 8);
 	return ab;
 }
@@ -128,8 +136,8 @@ void vincenty_inverse(struct Coordinates *location, struct Coordinates *location
 	else {
 		a = salp / cosl(u1);
 		b = sqrtl(1 - sqr(a));
-		if (cosl(u1) * sinl(u2) + sinl(u1) * cosl(u2) * cosl(lambda) < 0)
-			b = b * -1;
+		if ((cosl(u1) * sinl(u2) + sinl(u1) * cosl(u2) * cosl(lambda)) < 0)
+			b *= -1;
 
 		c = salp;
 		d = -sinl(u1) * ssig + cosl(u1) * csig * b;
