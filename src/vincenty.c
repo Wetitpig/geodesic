@@ -34,7 +34,7 @@ struct Coordinates helmert(long double calp)
 		ab.lat += Alookup[k];
 	}
 	ab.lat /= (1 - k1);
-	ab.lon = k1 * (1 - 3 * sqr(k1) / 8);
+	ab.lon = k1 * (1 - 3 * sqr(k1) / 8 + powl(k1, 4) / 16 - 19 * powl(k1, 6) / 1024);
 	return ab;
 }
 
@@ -86,7 +86,7 @@ void vincenty_inverse(struct Coordinates *location, struct Coordinates *location
 			d = 1;
 			break;
 		}
-	} while (fabsl(oldvalue[0] - lambda) >= powl(10,-15));
+	} while (fabsl(oldvalue[0] - lambda) >= powl(2,-48));
 
 	if (d == 1) {
 		londiff = (londiff > 0 ? M_PI : -M_PI) - londiff;
@@ -116,7 +116,7 @@ void vincenty_inverse(struct Coordinates *location, struct Coordinates *location
 			ssig = sqrtl(ssig);
 			sig = M_PI - asinl(ssig);
 
-		} while (fabsl(oldvalue[0] - salp) >= powl(10,-15));
+		} while (fabsl(oldvalue[0] - salp) >= powl(2,-48));
 	}
 
 	ab = helmert(calp);
@@ -176,7 +176,7 @@ void vincenty_direct(struct Coordinates *point, struct Vector *add, long double 
 		s2 = 2 * s1 + sigma;
 		dsig = b * sinl(sigma) * (cosl(s2) + b / 4 * (cosl(sigma) * (2 * sqr(cosl(s2)) - 1) - b / 6 * cosl(s2) * (4 * sqr(sinl(sigma)) - 3) * (4 * sqr(cosl(s2)) - 3)));
 		sigma = add->s / (RAD_MIN * a) + dsig;
-	} while (fabsl(oldvalue - sigma) >= powl(10, -15));
+	} while (fabsl(oldvalue - sigma) >= powl(2, -48));
 
 	*res = atan2_modified(sinl(u1) * cosl(sigma) + cosl(u1) * sinl(sigma) * cosl(add->theta), (1 - FLAT) * hypotl(salp, sinl(u1) * sinl(sigma) - cosl(u1) * cosl(sigma) * cosl(add->theta)));
 	lambda = atan2_modified(sinl(sigma) * sinl(add->theta), cosl(u1) * cosl(sigma) - sinl(u1) * sinl(sigma) * cosl(add->theta));
