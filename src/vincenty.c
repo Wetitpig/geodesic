@@ -4,6 +4,28 @@
 
 const long double Alookup[5] = {25.0/16384, 1.0/256, 1.0/64, 1.0/4, 1};
 
+const long double Blookup[8][4] = {
+{-1.0/2,3.0/16,-1.0/32,19.0/2048},
+{-1.0/16,1.0/32,-9.0/2048,7.0/4096},
+{-1.0/48,3.0/256,-3.0/2048},
+{-5.0/512,3.0/512,-11.0/16384},
+{-7.0/1280,7.0/2048},
+{-7.0/2048,9.0/4096},
+{-33.0/14336},
+{-429.0/212144.0}
+};
+
+const long double B1lookup[8][4] = {
+{1.0/2,-9.0/32,205.0/1536,-4879.0/73728},
+{5.0/16,-37.0/96,1335.0/4096,-86171.0/363840},
+{29.0/96,-75.0/128,2901.0/4096},
+{539.0/1536,-2391.0/2560,1082857.0/737280},
+{3467.0/7680.0,-28223.0/18432},
+{38081.0/61440,-733437.0/286720},
+{459485.0/516096},
+{109167851.0/82575360}
+};
+
 long double tan_reduced_latitude(long double lat)
 {
 	return (1 - FLAT) * tanl(lat);
@@ -11,18 +33,31 @@ long double tan_reduced_latitude(long double lat)
 
 long double reduced_latitude(long double lat)
 {
-	if (lat == M_PI_2)
-		return M_PI_2;
-	else if (lat == -M_PI_2)
-		return -M_PI_2;
+	if (isnan(tanl(lat)))
+		return copysignl(M_PI_2, lat);
 	else
 		return atanl(tan_reduced_latitude(lat));
 }
 
-struct Coordinates helmert(long double calp)
+long double sin_reduced_latitude(long double lat)
 {
-	struct Coordinates ab;
-	ab.lat = 0;
+	if (isnan(tanl(lat)))
+		return copysignl(1, lat);
+	else
+		return copysignl(1 / hypotl(1, 1 / tan_reduced_latitude(lat)), lat);
+}
+
+long double cos_reduced_latitude(long double lat)
+{
+	if (isnan(tanl(lat)))
+		return 0;
+	else
+		return 1 / hypotl(1, tan_reduced_latitude(lat));
+}
+
+long double helmertA(long double calp)
+{
+	long double A = 0;
 	long double usq, k1;
 	int k;
 
@@ -30,12 +65,49 @@ struct Coordinates helmert(long double calp)
 	k1 = sqrtl(1 + usq);
 	k1 = (k1 - 1) / (k1 + 1);
 	for (k = 0; k < 5; k++) {
-		ab.lat *= sqr(k1);
-		ab.lat += Alookup[k];
+		A *= sqr(k1);
+		A += Alookup[k];
 	}
-	ab.lat /= (1 - k1);
-	ab.lon = k1 * (1 - 3 * sqr(k1) / 8 + powl(k1, 4) / 16 - 19 * powl(k1, 6) / 1024);
-	return ab;
+	A /= (1 - k1);
+	return A;
+}
+
+long double helmertB(long double calp, long double sig)
+{
+	long double B = 0;
+	long double usq, k1, c;
+	int k, j, i;
+
+	usq = calp * ECC2;
+	k1 = sqrtl(1 + usq);
+	k1 = (k1 - 1) / (k1 + 1);
+	for (k = 1; k < 9; k++) {
+		c = 0;
+		i = 0;
+		for (j = k; j < 9; j += 2)
+			c += Blookup[k - 1][i++] * powl(k1, j);
+		B += c * sinl(2 * k * sig);
+	}
+	return B;
+}
+
+long double helmertB1(long double calp, long double sig)
+{
+	long double B = 0;
+	long double usq, k1, c;
+	int k, j, i;
+
+	usq = calp * ECC2;
+	k1 = sqrtl(1 + usq);
+	k1 = (k1 - 1) / (k1 + 1);
+	for (k = 1; k < 9; k++) {
+		c = 0;
+		i = 0;
+		for (j = k; j < 9; j += 2)
+			c += B1lookup[k - 1][i++] * powl(k1, j);
+		B += c * sinl(2 * k * sig);
+	}
+	return B;
 }
 
 static inline long double Cfromcalp(long double calp)
@@ -45,15 +117,13 @@ static inline long double Cfromcalp(long double calp)
 
 void vincenty_inverse(struct Coordinates *location, struct Coordinates *location2, long double *res, int count)
 {
-	long double londiff, lambda, u1, u2;
+	long double londiff, lambda, u1, u2, cu1, cu2, su1, su2;
 	long double ssig, csig, sig, salp, calp, cos2, c;
 	long double a, b, dsig, s;
 	int i = 0;
 
 	long double oldvalue[2];
 	oldvalue[0] = 0;
-
-	struct Coordinates ab;
 
 	long double d = 0;
 
@@ -62,19 +132,23 @@ void vincenty_inverse(struct Coordinates *location, struct Coordinates *location
 
 	u1 = reduced_latitude(location->lat);
 	u2 = reduced_latitude(location2->lat);
+	cu1 = cos_reduced_latitude(location->lat);
+	cu2 = cos_reduced_latitude(location2->lat);
+	su1 = sin_reduced_latitude(location->lat);
+	su2 = sin_reduced_latitude(location2->lat);
 
 	do {
 		oldvalue[1] = oldvalue[0];
 		oldvalue[0] = lambda;
 
-		ssig = hypotl(cosl(u2) * sinl(lambda), cosl(u1) * sinl(u2) - sinl(u1) * cosl(u2) * cosl(lambda));
-		csig = sinl(u1) * sinl(u2) + cosl(u1) * cosl(u2) * cosl(lambda);
+		ssig = hypotl(cu2 * sinl(lambda), cu1 * su2 - su1 * cu2 * cosl(lambda));
+		csig = su1 * su2 + cu1 * cu2 * cosl(lambda);
 
 		sig = atan2_modified(ssig, csig);
 
-		salp = cosl(u1) * cosl(u2) * sinl(lambda) / ssig;
+		salp = cu1 * cu2 * sinl(lambda) / ssig;
 		calp = 1 - sqr(salp);
-		cos2 = csig - 2 * sinl(u1) * sinl(u2) / calp;
+		cos2 = csig - 2 * su1 * su2 / calp;
 		if (cos2 < -1 || isnan(cos2))
 			cos2 = -1;
 
@@ -103,15 +177,15 @@ void vincenty_inverse(struct Coordinates *location, struct Coordinates *location
 		do {
 			oldvalue[0] = salp;
 			c = Cfromcalp(calp);
-			cos2 = csig - 2 * sinl(u1) * sinl(u2) / calp;
+			cos2 = csig - 2 * su1 * su2 / calp;
 
 			d = (1 - c) * FLAT * (sig + c * ssig * (cos2 + c * csig * (2 * sqr(cos2) - 1)));
 			salp = (londiff - asinl(lambda)) / d;
 			calp = 1 - sqr(salp);
 
-			lambda = salp * ssig / (cosl(u1) * cosl(u2));
+			lambda = salp * ssig / (cu1 * cu2);
 
-			ssig = sqr(cosl(u2) * lambda) + sqr(cosl(u1) * sinl(u2) + sinl(u1) * cosl(u2) * sqrtl(1 - sqr(lambda)));
+			ssig = sqr(cu2 * lambda) + sqr(cu1 * su2 + su1 * cu2 * sqrtl(1 - sqr(lambda)));
 			csig = -sqrtl(1 - ssig);
 			ssig = sqrtl(ssig);
 			sig = M_PI - asinl(ssig);
@@ -119,28 +193,30 @@ void vincenty_inverse(struct Coordinates *location, struct Coordinates *location
 		} while (fabsl(oldvalue[0] - salp) >= powl(2,-48));
 	}
 
-	ab = helmert(calp);
-	a = ab.lat;
-	b = ab.lon;
+	a = helmertA(calp);
 
-	dsig = b * ssig * (cos2 + b / 4 * (csig * (2 * sqr(cos2) - 1) - b / 6 * cos2 * (4 * sqr(ssig) - 3) * (4 * sqr(cos2) - 3)));
-	s = RAD_MIN * a * (sig - dsig);
+	ssig = hypotl(cu2 * sinl(lambda), cu1 * su2 - su1 * cu2 * cosl(lambda));
+	csig = su1 * su2 + cu1 * cu2 * cosl(lambda);
+	sig = atan2_modified(ssig, csig);
+	b = helmertB(calp, sig);
+
+	s = RAD_MIN * a * (sig + b);
 
 	if (i != 16384) {
-		a = cosl(u2) * sinl(lambda);
-		b = cosl(u1) * sinl(u2) - sinl(u1) * cosl(u2) * cosl(lambda);
+		a = cu2 * sinl(lambda);
+		b = cu1 * su2 - su1 * cu2 * cosl(lambda);
 
-		c = cosl(u1) * sinl(lambda);
-		d = cosl(u1) * sinl(u2) * cosl(lambda) - sinl(u1) * cosl(u2);
+		c = cu1 * sinl(lambda);
+		d = cu1 * su2 * cosl(lambda) - su1 * cu2;
 	}
 	else {
-		a = salp / cosl(u1);
+		a = salp / cu1;
 		b = sqrtl(1 - sqr(a));
-		if ((cosl(u1) * sinl(u2) + sinl(u1) * cosl(u2) * cosl(lambda)) < 0)
+		if ((cu1 * su2 + su1 * cu2 * cosl(lambda)) < 0)
 			b *= -1;
 
 		c = salp;
-		d = -sinl(u1) * ssig + cosl(u1) * csig * b;
+		d = -su1 * ssig + cu1 * csig * b;
 	}
 
 	if (count > 2) {
@@ -155,37 +231,29 @@ void vincenty_inverse(struct Coordinates *location, struct Coordinates *location
 
 void vincenty_direct(struct Coordinates *point, struct Vector *add, long double *res)
 {
-	long double u1, s1, salp, a, b;
-	long double sigma, s2, dsig, oldvalue;
+	long double u1, su1, cu1, s1, s2, salp, a;
+	long double sigma, oldvalue;
 	long double lambda, c;
 
-	struct Coordinates ab;
-
 	u1 = reduced_latitude(point->lat);
+	su1 = sin_reduced_latitude(point->lat);
+	cu1 = cos_reduced_latitude(point->lat);
 	s1 = atan2_modified(tan_reduced_latitude(point->lat), cosl(add->theta));
-	salp = cosl(u1) * sinl(add->theta);
+	salp = cu1 * sinl(add->theta);
 
-	ab = helmert(1 - sqr(salp));
-	a = ab.lat;
-	b = ab.lon;
+	a = helmertA(1 - sqr(salp));
 	sigma = add->s / (RAD_MIN * a);
+	sigma += helmertB1(1 - sqr(salp), sigma);
+	s2 = 2 * s1 + sigma;
 
-	do {
-		oldvalue = sigma;
-
-		s2 = 2 * s1 + sigma;
-		dsig = b * sinl(sigma) * (cosl(s2) + b / 4 * (cosl(sigma) * (2 * sqr(cosl(s2)) - 1) - b / 6 * cosl(s2) * (4 * sqr(sinl(sigma)) - 3) * (4 * sqr(cosl(s2)) - 3)));
-		sigma = add->s / (RAD_MIN * a) + dsig;
-	} while (fabsl(oldvalue - sigma) >= powl(2, -48));
-
-	*res = atan2_modified(sinl(u1) * cosl(sigma) + cosl(u1) * sinl(sigma) * cosl(add->theta), (1 - FLAT) * hypotl(salp, sinl(u1) * sinl(sigma) - cosl(u1) * cosl(sigma) * cosl(add->theta)));
-	lambda = atan2_modified(sinl(sigma) * sinl(add->theta), cosl(u1) * cosl(sigma) - sinl(u1) * sinl(sigma) * cosl(add->theta));
+	*res = atan2_modified(su1 * cosl(sigma) + cu1 * sinl(sigma) * cosl(add->theta), (1 - FLAT) * hypotl(salp, su1 * sinl(sigma) - cu1 * cosl(sigma) * cosl(add->theta)));
+	lambda = atan2_modified(sinl(sigma) * sinl(add->theta), cu1 * cosl(sigma) - su1 * sinl(sigma) * cosl(add->theta));
 
 	c = Cfromcalp(1 - sqr(salp));
 	*(res + 1) = lambda - (1 - c) * FLAT * salp * (sigma + c * sinl(sigma) * (cosl(s2) + c * cosl(sigma) * (2 * sqr(cosl(s2)) - 1)));
 	*(res + 1) = normalise_c(*(res + 1) + point->lon);
 
-	*(res + 2) = normalise_a(atan2_modified(salp, -sinl(u1) * sinl(sigma) + cosl(u1) * cosl(sigma) * cosl(add->theta)));
+	*(res + 2) = normalise_a(atan2_modified(salp, -su1 * sinl(sigma) + cu1 * cosl(sigma) * cosl(add->theta)));
 
 	return;
 }

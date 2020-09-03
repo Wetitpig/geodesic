@@ -55,20 +55,28 @@ ECC2*ECC2*ECC2*ECC2*ECC2/792792
 }
 };
 
+long double sigeval(long double lat, long double azimuth)
+{
+	long double y, x;
+	y = copysignl(1 / hypotl(1, 1 / tan_reduced_latitude(lat)), lat);
+	x = 1 / hypotl(1, tan_reduced_latitude(lat)) * cosl(azimuth);
+	return atan2_modified(y, x);
+}
+
 long double I4(long double csig, long double salp)
 {
 	int k, j;
 	long double csigp[12];
 	csigp[0] = 1;
 	csigp[1] = csig;
-	for (k = 2; k < 12; k++)
-		csigp[k] = 2 * csig * csigp[k - 1] - csigp[k - 2];
 
 	long double i = 0, c;
 	for (k = 0; k < 6; k++) {
 		c = 0;
 		for (j = k; j < 6; j++)
 			c += powl(1 - sqr(salp), j) * Clookup[k][j];
+		csigp[2 * k + 2] = 2 * csig * csigp[2 * k + 1] - csigp[2 * k];
+		csigp[2 * k + 3] = 2 * csig * csigp[2 * k + 2] - csigp[2 * k + 1];
 		i += c * csigp[2 * k + 1];
 	}
 	return i;
@@ -175,8 +183,8 @@ void karney(struct Coordinates *vertex, int i, int s, int a, long double *res)
 			if (coor0->lon != coor1->lon && !isnan(tanl(coor0->lat)) && !isnan(tanl(coor1->lat))) {
 				interarea = sinl(2 * asinl(*(inter + 3))) / 2;
 
-				sig1 = atan2_modified(sinl(reduced_latitude(coor1->lat)), cosl(reduced_latitude(coor1->lat)) * cosl(*(inter + 2)));
-				sig0 = atan2_modified(sinl(reduced_latitude(coor0->lat)), cosl(reduced_latitude(coor0->lat)) * cosl(*(inter + 1)));
+				sig1 = sigeval(coor1->lat, *(inter + 2));
+				sig0 = sigeval(coor0->lat, *(inter + 1));
 				interarea *= I4(cosl(sig0), *(inter + 3)) - I4(cosl(sig1), *(inter + 3));
 
 				darea += interarea;
