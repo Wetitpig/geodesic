@@ -58,8 +58,8 @@ ECC2*ECC2*ECC2*ECC2*ECC2/792792
 long double sigeval(long double lat, long double azimuth)
 {
 	long double y, x;
-	y = copysignl(1 / hypotl(1, 1 / tan_reduced_latitude(lat)), lat);
-	x = 1 / hypotl(1, tan_reduced_latitude(lat)) * cosl(azimuth);
+	y = sin_reduced_latitude(lat);
+	x = cos_reduced_latitude(lat) * cosl(azimuth);
 	return atan2_modified(y, x);
 }
 
@@ -172,13 +172,10 @@ void karney(struct Coordinates *vertex, int i, int s, int a, long double *res)
 
 		if (a == 1) {
 			next = *(inter + 1);
-			if (h == 0) {
-				vincenty_inverse(vertex, vertex + i - 1, inter + 4, 4);
-				prev = *(inter + 5);
-			}
-			else
-				prev = normalise_a(*(inter + 6) - M_PI);
-			excess += normalise_a(next - prev);
+			if (h == 0)
+				vincenty_inverse(vertex + i - 1, vertex, inter + 4, 4);
+			prev = *(inter + 6);
+			excess += normalise_a(next - prev + M_PI);
 
 			if (coor0->lon != coor1->lon && !isnan(tanl(coor0->lat)) && !isnan(tanl(coor1->lat))) {
 				interarea = sinl(2 * asinl(*(inter + 3))) / 2;
