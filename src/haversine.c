@@ -10,11 +10,11 @@ long double haversine_inverse_distance(struct Coordinates *location)
 	latdiff = (location + 1)->lat - location->lat;
 	londiff = (location + 1)->lon - location->lon;
 
-	a = sqr(sin(latdiff / 2));
-	b = sqr(sinl(londiff / 2));
+	a = sqr(sin(latdiff / 2.0l));
+	b = sqr(sinl(londiff / 2.0l));
 	a += cosl((location + 1)->lat) * cosl(location->lat) * b;
 
-	return 2 * atan2_modified(sqrtl(a), sqrtl(1-a)) * RADIUS;
+	return 2.0l * atan2_modified(sqrtl(a), sqrtl(1-a)) * RADIUS;
 }
 
 long double haversine_bearing(struct Coordinates *start, struct Coordinates *end)
@@ -42,7 +42,7 @@ struct Coordinates haversine_direct(struct Coordinates *point, struct Vector *ad
 		x = cosl(point->lat) * cosl(result.lat);
 		result.lon = acosl(y / x);
 		if (result.lon < 0)
-			result.lon = M_PI_2 - result.lon;
+			result.lon = M_PI_L / 2.0l - result.lon;
 	}
 	else
 		result.lon = atan2_modified(y, x);

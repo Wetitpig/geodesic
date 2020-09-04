@@ -4,15 +4,17 @@
 
 #define __HAVE_GEODESIC_MATH_H__
 
-#define RADIUS 6371.0088
-#define RAD (M_PI / 180)
+#define M_PI_L 3.14159265358979323846264338327950l
 
-#define RAD_MAJ 6378.137
-#define FLAT (1/298.257223563)
+#define RADIUS 6371.0088l
+#define RAD (M_PI_L / 180l)
 
-#define RAD_MIN (RAD_MAJ * (1 - FLAT))
-#define ECC (FLAT * (2 - FLAT))
-#define ECC2 (ECC / (1 - ECC))
+#define RAD_MAJ 6378.137l
+#define FLAT (1.0l/298.257223563l)
+
+#define RAD_MIN (RAD_MAJ * (1.0l - FLAT))
+#define ECC (FLAT * (2.0l - FLAT))
+#define ECC2 (ECC / (1.0l - ECC))
 
 struct Coordinates {
 	long double lat;

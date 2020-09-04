@@ -19,9 +19,9 @@ long double atan2_modified(long double y, long double x)
 	}
 	else {
 		if (y > 0)
-			return M_PI_2;
+			return M_PI_L / 2;
 		else if (y < 0)
-			return -M_PI_2;
+			return -M_PI_L / 2;
 		else
 			return NAN;
 	}
@@ -29,14 +29,14 @@ long double atan2_modified(long double y, long double x)
 
 long double normalise_a(long double x)
 {
-	return fmodl(x + 2 * M_PI, 2 * M_PI);
+	return fmodl(x + 2 * M_PI_L, 2 * M_PI_L);
 }
 
 long double normalise_c(long double x)
 {
-	if (x > M_PI)
-		return x - 2 * M_PI;
-	else if (x < -M_PI)
-		return x + 2 * M_PI;
+	if (x > M_PI_L)
+		return x - 2 * M_PI_L;
+	else if (x < -M_PI_L)
+		return x + 2 * M_PI_L;
 	return x;
 }

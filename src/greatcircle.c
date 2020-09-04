@@ -13,7 +13,7 @@ long double greatcircle_area(struct Coordinates *vertex, int i)
 		excess += normalise_a(next - prev);
 	}
 
-	excess = excess - (i - 2) * M_PI;
+	excess = excess - (i - 2) * M_PI_L;
 
 	return fabsl(sqr(RADIUS) * excess);
 }
