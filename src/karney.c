@@ -83,83 +83,15 @@ long double I4(long double csig, long double salp)
 	return i;
 }
 
-int isblock(struct Coordinates *vertex)
-{
-	int block = 1;
-	block &= (vertex->lat == (vertex + 1)->lat && (vertex + 2)->lat == (vertex + 3)->lat && (vertex + 1)->lon == (vertex + 2)->lon && vertex->lon == (vertex + 3)->lon);
-	block |= (vertex->lon == (vertex + 1)->lon && (vertex + 2)->lon == (vertex + 3)->lon && (vertex + 1)->lat == (vertex + 2)->lat && vertex->lat == (vertex + 3)->lat);
-	return block;
-}
-
-int ispolariso(struct Coordinates *vertex)
-{
-	int k;
-	for (k = 0; k < 3; k++) {
-		if (fabsl((vertex + k)->lat) / RAD == 90 && (vertex + (k + 1) % 3)->lat == (vertex + (k + 2) % 3)->lat)
-			break;
-	}
-	return k;
-}
-
-long double ellipblock(struct Coordinates *vertex)
-{
-	long double lat[2], lon[2];
-	if (vertex->lat < (vertex + 2)->lat) {
-		lat[0] = vertex->lat;
-		lat[1] = (vertex + 2)->lat;
-	}
-	else {
-		lat[0] = (vertex + 2)->lat;
-		lat[1] = vertex->lat;
-	}
-
-	if (vertex->lon < (vertex + 2)->lon) {
-		lon[0] = vertex->lon;
-		lon[1] = (vertex + 2)->lon;
-	}
-	else {
-		lon[0] = (vertex + 2)->lon;
-		lon[1] = vertex->lon;
-	}
-
-	long double londiff = fabsl(normalise_c(lon[1] - lon[0]));
-	long double latdiff = sinl(lat[1]) / (1.0l - ECC * sqr(sinl(lat[1]))) - sinl(lat[0]) / (1.0l - ECC * sqr(sinl(lat[0])));
-	latdiff += logl((1.0l + sqrtl(ECC) * sinl(lat[1])) * (1.0l - sqrtl(ECC) * sinl(lat[0])) / (1.0l - sqrtl(ECC) * sinl(lat[1])) / (1.0l + sqrtl(ECC) * sinl(lat[0]))) / (2.0l * sqrtl(ECC));
-
-	return sqr(RAD_MIN) * londiff * latdiff / 2.0l;
-}
-
 void karney(struct Coordinates *vertex, int i, int s, int a, long double *res)
 {
 	long double *inter = malloc(sizeof(long double) * 8);
 	long double prev, next, excess = 0;
 	long double area, darea = 0, interarea;
 	long double sig0, sig1;
-
 	long double perimeter = 0;
 
 	int h, k;
-
-	if (a == 1) {
-		if (i == 4 && isblock(vertex)) {
-			area = ellipblock(vertex);
-			a = 0;
-		}
-		else if (i == 3 && (k = ispolariso(vertex)) < 3) {
-			struct Coordinates *triangle = malloc(sizeof(struct Coordinates) * 4);
-
-			triangle->lat = (vertex + k)->lat;
-			triangle->lon = (vertex + ((k + 2) % 3))->lon;
-			memcpy(triangle + 1, vertex + ((k + 1) % 3), sizeof(struct Coordinates));
-			for (h = 2; h < 4; h++) {
-				(triangle + h)->lat = (vertex + ((k + h) % 3))->lat;
-				(triangle + h)->lon = (triangle + (3 - h))->lon;
-			}
-			area = ellipblock(triangle);
-			free(triangle);
-			a = 0;
-		}
-	}
 
 	struct Coordinates *coor0, *coor1;
 	for (h = 0; h < i; h++) {

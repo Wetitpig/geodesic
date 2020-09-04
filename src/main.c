@@ -10,6 +10,7 @@
 #include "vincenty.h"
 #include "greatcircle.h"
 #include "karney.h"
+#include "mpblock.h"
 
 void help(char *name)
 {
@@ -83,6 +84,8 @@ int main(int argc, char **argv)
 				j = 1;
 			else if (strcmp(optarg, "ellipsoid") == 0)
 				j = 2;
+			else if (strcmp(optarg, "block") == 0)
+				j = 3;
 			else
 				error("Invalid formula.");
 			break;
@@ -144,6 +147,9 @@ int main(int argc, char **argv)
 				start = *(res + 1);
 				end = *(res + 2);
 				break;
+				default:
+				error("Formula not available for inverse problem.");
+				break;
 			}
 
 			if (isnan(c) && memcmp(location, location + 1, sizeof(struct Coordinates)) == 0)
@@ -199,6 +205,9 @@ int main(int argc, char **argv)
 				(point + 1)->lat = *res;
 				(point + 1)->lon = *(res + 1);
 				end = *(res + 2);
+				break;
+				default:
+				error("Formula not available for direct problem.");
 				break;
 			}
 
@@ -263,6 +272,13 @@ int main(int argc, char **argv)
 				karney(vertex, i, distance, azimuth, res);
 				perimeter = *res;
 				area = *(res + 1);
+				break;
+				case 3:
+				mpblock(vertex, i, distance, azimuth, res);
+				perimeter = *res;
+				area = *(res + 1);
+				if (isnan(area) && isnan(perimeter))
+					error("Not a meridian-parallel block.");
 				break;
 			}
 		}

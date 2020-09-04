@@ -13,6 +13,7 @@
 #define FLAT (1.0l/298.257223563l)
 
 #define RAD_MIN (RAD_MAJ * (1.0l - FLAT))
+#define FLAT_3 ((RAD_MAJ - RAD_MIN) / (RAD_MAJ + RAD_MIN))
 #define ECC (FLAT * (2.0l - FLAT))
 #define ECC2 (ECC / (1.0l - ECC))
 
