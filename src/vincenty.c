@@ -190,10 +190,6 @@ void vincenty_inverse(struct Coordinates *location, struct Coordinates *location
 	}
 
 	a = helmertA(calp);
-
-	ssig = hypotl(cu2 * sinl(lambda), cu1 * su2 - su1 * cu2 * cosl(lambda));
-	csig = su1 * su2 + cu1 * cu2 * cosl(lambda);
-	sig = atan2_modified(ssig, csig);
 	b = helmertB(calp, sig);
 
 	s = RAD_MIN * a * (sig + b);
