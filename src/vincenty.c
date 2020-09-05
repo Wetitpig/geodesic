@@ -2,8 +2,6 @@
 #include "geodesic.h"
 #include "vincenty.h"
 
-const long double Alookup[5] = {25.0l/16384.0l, 1.0l/256.0l, 1.0l/64.0l, 1.0l/4.0l, 1.0l};
-
 const long double Blookup[8][4] = {
 {-1.0l/2.0l,3.0l/16.0l,-1.0l/32.0l,19.0l/2048.0l},
 {-1.0l/16.0l,1.0l/32.0l,-9.0l/2048.0l,7.0l/4096.0l},
@@ -64,10 +62,8 @@ long double helmertA(long double calp)
 	usq = calp * ECC2;
 	k1 = sqrtl(1.0l + usq);
 	k1 = (k1 - 1.0l) / (k1 + 1.0l);
-	for (k = 0; k < 5; k++) {
-		A *= sqr(k1);
-		A += Alookup[k];
-	}
+	for (k = 0; k < 11; k++)
+		A += sqr(double_fac(2 * k - 3) / double_fac(2 * k) * powl(k1, k));
 	A /= (1 - k1);
 	return A;
 }

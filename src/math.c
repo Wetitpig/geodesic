@@ -6,6 +6,19 @@ long double sqr(long double operand)
 	return operand * operand;
 }
 
+long double double_fac(int x)
+{
+	if (x == -3)
+		return -1;
+	else {
+		long double y = 1;
+		while (x > 0) {
+			y *= x;
+			x -= 2;
+		}
+		return y;
+	}
+}
 
 long double atan2_modified(long double y, long double x)
 {

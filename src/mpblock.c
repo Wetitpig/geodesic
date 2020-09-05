@@ -1,20 +1,7 @@
 #include <math.h>
+#include "math.h"
 #include "io.h"
 #include "mpblock.h"
-
-long double double_fac(int x)
-{
-	if (x == -3)
-		return -1;
-	else {
-		long double y = 1;
-		while (x > 0) {
-			y *= x;
-			x -= 2;
-		}
-		return y;
-	}
-}
 
 int isblock(struct Coordinates *vertex)
 {
