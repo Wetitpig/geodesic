@@ -62,8 +62,8 @@ long double meridian_arc(long double lat0, long double lat1)
 		for (j = 0; j < 11; j++)
 			c += double_fac(2 * j - 3) / double_fac(2 * j) * double_fac(2 * j + 2 * k - 3) / double_fac(2 * j + 2 * k) * powl(FLAT_3, k + 2 * j);
 		c /= k;
-		c *= powl(-1.0l, k) * (1 - 2 * k) * (1 + 2 * k);
-		m += c * (sin(2.0l * lat1) - sin(2.0l * lat0));
+		c *= powl(-1.0l, k) * (1 - sqr(2 * k));
+		m += c * (sin(2.0l * k * lat1) - sin(2.0l * k * lat0));
 	}
 
 	return (RAD_MAJ + RAD_MIN) / 2 * m;
@@ -96,8 +96,8 @@ void mpblock_area(struct Coordinates *vertex, int i, long double s, long double 
 		if (a == 1)
 			*(res + 1) = ellipblock(lat[0], lat[1], lon[0], lon[1]);
 		if (s == 1) {
-			*res = parallel_length(lat[0], lat[1], lon[0]);
-			*res += parallel_length(lat[0], lat[1], lon[1]);
+			*res = parallel_length(lon[0], lon[1], lat[0]);
+			*res += parallel_length(lon[0], lon[1], lat[1]);
 			*res += meridian_arc(lat[0], lat[1]) * 2.0l;
 		}
 	}
