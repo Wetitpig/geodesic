@@ -1,4 +1,5 @@
 #include <math.h>
+#include "io.h"
 #include "mpblock.h"
 
 long double double_fac(int x)
@@ -44,30 +45,31 @@ long double ellipblock(long double lat0, long double lat1, long double lon0, lon
 
 long double parallel_length(long double lon0, long double lon1, long double lat)
 {
-	return cosl(lat) * fabsl(normalise_c(lon1 - lon0)) / sqrtl(1.0l - ECC * sqr(sinl(lat)));
+	return cosl(lat) * fabsl(normalise_c(lon1 - lon0)) / sqrtl(1.0l - ECC * sqr(sinl(lat))) * RAD_MAJ;
 }
 
 long double meridian_arc(long double lat0, long double lat1)
 {
 	int k, j;
-	long double c = 0, m = 0;
+	long double c = 0, m;
 
 	for (j = 0; j < 11; j++)
-		c += sqr(double_fac(2 * j - 3) / double_fac(2 * j)) * powl(FLAT_3, 2 * j);
-	m += c * (lat1 - lat0);
+		c += sqr(double_fac(2 * j - 3) / double_fac(2 * j) * powl(FLAT_3, j));
+	m = c * (lat1 - lat0);
 
 	for (k = 1; k < 6; k++) {
 		c = 0;
 		for (j = 0; j < 11; j++)
 			c += double_fac(2 * j - 3) / double_fac(2 * j) * double_fac(2 * j + 2 * k - 3) / double_fac(2 * j + 2 * k) * powl(FLAT_3, k + 2 * j);
 		c /= k;
-		m += powl(-1.0l, k) * c * (sin(2.0l * lat1) - sin(2.0l * lat0));
+		c *= powl(-1.0l, k) * (1 - 2 * k) * (1 + 2 * k);
+		m += c * (sin(2.0l * lat1) - sin(2.0l * lat0));
 	}
 
 	return (RAD_MAJ + RAD_MIN) / 2 * m;
 }
 
-void mpblock(struct Coordinates *vertex, int i, long double s, long double a, long double *res)
+void mpblock_area(struct Coordinates *vertex, int i, long double s, long double a, long double *res)
 {
 	int h, k;
 
@@ -118,9 +120,55 @@ void mpblock(struct Coordinates *vertex, int i, long double s, long double a, lo
 			*res += meridian_arc((vertex + k + 1)->lat, (vertex + k)->lat) * 2.0l;
 		}
 	}
-	else {
-		*res = NAN;
-		*(res + 1) = NAN;
+	else
+		error("Not a meridian-parallel block.");
+	return;
+}
+
+void mpblock_inverse(struct Coordinates *location, struct Coordinates *location2, long double *res)
+{
+	if (location->lon == location2->lon || location->lat / RAD == 90 || location2->lat / RAD == 90) {
+		long double lat[2];
+		if (location->lat < location2->lat) {
+			lat[0] = location->lat;
+			lat[1] = location2->lat;
+			*(res + 1) = 0;
+		}
+		else {
+			lat[1] = location->lat;
+			lat[0] = location2->lat;
+			*(res + 1) = M_PI_L;
+		}
+		*res = meridian_arc(lat[0], lat[1]);
 	}
+	else if (location->lat == location2->lat) {
+		long double conjugate = normalise_c(location->lon + M_PI_L);
+
+		if (location->lon > 0) {
+			if (location2->lon < location->lon && location2->lon > conjugate)
+				*(res + 1) = 3 * M_PI_L / 2.0l;
+			else if (location2->lon > location->lon || location2->lon < conjugate)
+				*(res + 1) = M_PI_L / 2.0l;
+			else
+				*(res + 1) = M_PI_L * (location->lat < 0);
+		}
+		else if (location->lon < 0) {
+			if (location2->lon > location->lon && location2->lon < conjugate)
+				*(res + 1) = M_PI_L / 2.0l;
+			else if (location2->lon < location->lon || location2->lon > conjugate)
+				*(res + 1) = 3 * M_PI_L / 2.0l;
+			else
+				*(res + 1) = M_PI_L * (location->lat < 0);
+		}
+		else if (location2->lon / RAD != 180)
+			*(res + 1) = (location->lon < 0) * M_PI_L + M_PI_L / 2;
+		else
+			*(res + 1) = M_PI_L * (location->lat < 0);
+
+		long double lon[2];
+		*res = parallel_length(location->lon, location2->lon, location->lat);
+	}
+	else
+		error("Not a meridian arc or a parallel arc");
 	return;
 }

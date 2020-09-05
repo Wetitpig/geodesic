@@ -20,7 +20,7 @@ void help(char *name)
 
 	fputs("Algorithm options:\n", stderr);
 	fputs("\t-p [direct|inverse|polygon] Solve direct or inverse problem or polygon problem. \n", stderr);
-	fputs("\t-f [sphere|ellipsoid] Set projection to sphere or ellipsoid.\n", stderr);
+	fputs("\t-f [sphere|ellipsoid|block] Set projection to sphere or ellipsoid or parallel-meridian block (not available for direct problem).\n", stderr);
 
 	fputs("Computation options:\n", stderr);
 	fputs("\t-s Compute distances (a.k.a. perimeter) / coordinates.\n", stderr);
@@ -147,8 +147,11 @@ int main(int argc, char **argv)
 				start = *(res + 1);
 				end = *(res + 2);
 				break;
-				default:
-				error("Formula not available for inverse problem.");
+				case 3:
+				mpblock_inverse(location, location + 1, res);
+				c = *res;
+				start = *(res + 1);
+				end = start;				
 				break;
 			}
 
@@ -274,11 +277,9 @@ int main(int argc, char **argv)
 				area = *(res + 1);
 				break;
 				case 3:
-				mpblock(vertex, i, distance, azimuth, res);
+				mpblock_area(vertex, i, distance, azimuth, res);
 				perimeter = *res;
 				area = *(res + 1);
-				if (isnan(area) && isnan(perimeter))
-					error("Not a meridian-parallel block.");
 				break;
 			}
 		}

@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "geodesic.h"
 
 #ifndef __HAVE_MATHIO_H__
