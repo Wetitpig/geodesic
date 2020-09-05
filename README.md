@@ -22,9 +22,10 @@ geodesic [-i file] [-o file] [-k precision] [-p problem] [-f projection] [-s] [-
 * Inverse problem: Given 2 coordinates, evaluate the distance, the initial bearing and the final bearing.
 * Polygon problem: Given a set of coordinates, evaluate the perimeter and area.
 
-`-f [sphere|ellipsoid]` Select projection for evaluating the azimuths and distances.
-* Sphere projection employs the haversine algorithm. Error is higher (error ~0.5%).
-* Ellipsoid projection employs the Vincenty's algorithm. It is more resource-intensive (2x sphere projection).
+`-f [sphere|ellipsoid|block]` Select projection for evaluating the azimuths and distances.
+* Sphere projection employs the haversine algorithm and spherical triangle formula. Error is higher (error ~0.5%).
+* Ellipsoid projection employs the Vincenty's algorithm with modifications by Charles Karney. It is more resource-intensive (2x sphere projection).
+* Block projection means following parallels of latitude and meridians of longitude. For meridian arcs Bessel's series is implemented. All inputted coordinates should follow meridians of longitude and parallels of latitude.
 
 `-s` Different computations for different problems.
 * Distance between coordinates for inverse problems.
@@ -157,3 +158,4 @@ Where
 3. [Geodetic Inverse Solution between Antinodal Points](https://geographiclib.sourceforge.io/geodesic-papers/vincenty75b.pdf)
 4. [Determination of areas on the plane, sphere and ellipsoid](https://www.tandfonline.com/doi/abs/10.1179/sre.2006.38.301.583?journalCode=ysre20)
 5. [Geodesics on an ellipsoid of revolution](https://arxiv.org/pdf/1102.1215.pdf)
+6. [Meridian arc @ Wikipedia](https://en.wikipedia.org/wiki/Meridian_arc)
