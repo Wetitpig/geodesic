@@ -151,7 +151,6 @@ void mpblock_inverse(struct Coordinates *location, struct Coordinates *location2
 		else
 			*(res + 1) = M_PI_L * (location->lat < 0);
 
-		long double lon[2];
 		*res = parallel_length(location->lon, location2->lon, location->lat);
 	}
 	else
