@@ -62,7 +62,7 @@ long double helmertA(long double calp)
 	usq = calp * ECC2;
 	k1 = sqrtl(1.0l + usq);
 	k1 = (k1 - 1.0l) / (k1 + 1.0l);
-	for (k = 0; k < 11; k++)
+	for (k = 0; k < 8; k++)
 		A += sqr(double_fac(2 * k - 3) / double_fac(2 * k) * powl(k1, k));
 	A /= (1 - k1);
 	return A;
