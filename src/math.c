@@ -13,9 +13,9 @@ long double atan2_modified(long double y, long double x)
 		return atanl(y / x);
 	else if (x < 0) {
 		if (y < 0)
-			return atanl(y / x) - M_PI;
+			return atanl(y / x) - M_PI_L;
 		else
-			return atanl(y / x) + M_PI;
+			return atanl(y / x) + M_PI_L;
 	}
 	else {
 		if (y > 0)
