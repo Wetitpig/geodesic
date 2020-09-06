@@ -1,9 +1,9 @@
 CC=gcc
-CFLAGS=-O3 -Iinclude -g
+CFLAGS=-Ofast -Iinclude -g
 
 LDFLAGS=-lm
 
-HEADERS = constants.h functions.h haversine.h vincenty.h greatcircle.h karney.h karney_lookup.h
+HEADERS = geodesic.h functions.h haversine.h vincenty.h greatcircle.h karney.h
 
 %.o: src/%.c $(HEADERS)
 	$(CC) $(CFLAGS) -c -o $@

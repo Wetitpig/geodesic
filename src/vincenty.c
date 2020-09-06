@@ -2,17 +2,6 @@
 #include "geodesic.h"
 #include "vincenty.h"
 
-const long double Blookup[8][4] = {
-{-1.0l/2.0l,3.0l/16.0l,-1.0l/32.0l,19.0l/2048.0l},
-{-1.0l/16.0l,1.0l/32.0l,-9.0l/2048.0l,7.0l/4096.0l},
-{-1.0l/48.0l,3.0l/256.0l,-3.0l/2048.0l},
-{-5.0l/512.0l,3.0l/512.0l,-11.0l/16384.0l},
-{-7.0l/1280.0l,7.0l/2048.0l},
-{-7.0l/2048.0l,9.0l/4096.0l},
-{-33.0l/14336.0l},
-{-429.0l/212144.0l}
-};
-
 const long double B1lookup[8][4] = {
 {1.0l/2.0l,-9.0l/32.0l,205.0l/1536.0l,-4879.0l/73728.0l},
 {5.0l/16.0l,-37.0l/96.0l,1335.0l/4096.0l,-86171.0l/363840.0l},
@@ -68,21 +57,21 @@ long double helmertA(long double calp)
 	return A;
 }
 
-long double helmertB(long double calp, long double sig)
+long double helmertB(long double calp, long double sig, long double A)
 {
 	long double B = 0;
 	long double usq, k1, c;
-	int k, j, i;
+	int k, j;
 
 	usq = calp * ECC2;
 	k1 = sqrtl(1.0l + usq);
 	k1 = (k1 - 1.0l) / (k1 + 1.0l);
-	for (k = 1; k < 9; k++) {
-		c = 0;
-		i = 0;
-		for (j = k; j < 9; j += 2)
-			c += Blookup[k - 1][i++] * powl(k1, j);
-		B += c * sinl(2.0l * k * sig);
+	A *= (1 - k1);
+	for (k = 1; k < 17; k++) {
+		c = double_fac(2 * k - 3) / double_fac(2 * k) * powl(k1, k);
+		for (j = 1; (2 * j + k) < 17; j++)
+			c -= double_fac(2 * (j + k) - 3) / double_fac(2 * (j + k)) * double_fac(2 * j - 3) / double_fac(2 * j) * powl(k1, 2 * j + k);
+		B += c / (A * k) * sinl(2.0l * k * sig);
 	}
 	return B;
 }
@@ -190,9 +179,9 @@ void vincenty_inverse(struct Coordinates *location, struct Coordinates *location
 	}
 
 	a = helmertA(calp);
-	b = helmertB(calp, sig);
+	b = helmertB(calp, sig, a);
 
-	s = RAD_MIN * a * (sig + b);
+	s = RAD_MIN * a * (sig - b);
 
 	if (i != 16384) {
 		a = cu2 * sinl(lambda);
