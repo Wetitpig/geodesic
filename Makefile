@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Ofast -Iinclude -g
+CFLAGS=-O3 -Iinclude -g
 
 LDFLAGS=-lm
 
