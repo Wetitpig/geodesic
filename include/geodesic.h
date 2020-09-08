@@ -27,8 +27,9 @@ struct Vector {
 	long double theta;
 };
 
+const long double double_fac[17];
+
 long double sqr(long double operand);
-long double double_fac(int x);
 long double atan2_modified(long double y, long double x);
 long double normalise_a(long double x);
 long double normalise_c(long double x);

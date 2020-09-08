@@ -41,13 +41,13 @@ long double meridian_arc(long double lat0, long double lat1)
 	long double c = 0, m;
 
 	for (j = 0; j < 11; j++)
-		c += sqr(double_fac(2 * j - 3) / double_fac(2 * j) * powl(FLAT_3, j));
+		c += sqr(double_fac[j] * powl(FLAT_3, j));
 	m = c * (lat1 - lat0);
 
 	for (k = 1; k < 9; k++) {
 		c = 0;
 		for (j = 0; j < 8; j++)
-			c += double_fac(2 * j - 3) / double_fac(2 * j) * double_fac(2 * (j + k) - 3) / double_fac(2 * (j + k)) * powl(FLAT_3, k + 2 * j);
+			c += double_fac[j] * double_fac[j + k] * powl(FLAT_3, k + 2 * j);
 		c *= powl(-1.0l, k) * (1 - sqr(2 * k)) / k;
 		m += c * (sin(2.0l * k * lat1) - sin(2.0l * k * lat0));
 	}

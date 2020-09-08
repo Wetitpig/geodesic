@@ -2,17 +2,6 @@
 #include "geodesic.h"
 #include "vincenty.h"
 
-const long double B1lookup[8][4] = {
-{1.0l/2.0l,-9.0l/32.0l,205.0l/1536.0l,-4879.0l/73728.0l},
-{5.0l/16.0l,-37.0l/96.0l,1335.0l/4096.0l,-86171.0l/363840.0l},
-{29.0l/96.0l,-75.0l/128.0l,2901.0l/4096.0l},
-{539.0l/1536.0l,-2391.0l/2560.0l,1082857.0l/737280.0l},
-{3467.0l/7680.0l,-28223.0l/18432.0l},
-{38081.0l/61440.0l,-733437.0l/286720.0l},
-{459485.0l/516096.0l},
-{109167851.0l/82575360.0l}
-};
-
 long double tan_reduced_latitude(long double lat)
 {
 	return (1.0l - FLAT) * tanl(lat);
@@ -48,7 +37,7 @@ long double helmertA(long double k1)
 	int k;
 
 	for (k = 0; k < 5; k++)
-		A += sqr(double_fac(2 * k - 3) / double_fac(2 * k) * powl(k1, k));
+		A += sqr(double_fac[k] * powl(k1, k));
 	return A;
 }
 
@@ -59,28 +48,12 @@ long double helmertB(long double k1, long double sig)
 	int k, j;
 
 	for (k = 1; k < 9; k++) {
-		c = double_fac(2 * k - 3) / double_fac(2 * k);
+		c = double_fac[k];
 		for (j = 1; (2 * j + k) < 9 && c1 != c; j++) {
 			c1 = c;
-			c -= double_fac(2 * (j + k) - 3) / double_fac(2 * (j + k)) * double_fac(2 * j - 3) / double_fac(2 * j) * powl(k1, 2 * j);
+			c -= double_fac[j + k] * double_fac[j] * powl(k1, 2 * j);
 		}
 		B += c / k * sinl(2.0l * k * sig) * powl(k1, k);
-	}
-	return B;
-}
-
-long double helmertB1(long double k1, long double sig)
-{
-	long double B = 0;
-	long double c;
-	int k, j, i;
-
-	for (k = 1; k < 9; k++) {
-		c = 0;
-		i = 0;
-		for (j = k; j < 9; j += 2)
-			c += B1lookup[k - 1][i++] * powl(k1, j);
-		B += c * sinl(2.0l * k * sig);
 	}
 	return B;
 }
@@ -226,8 +199,6 @@ void vincenty_direct(struct Coordinates *point, struct Vector *add, long double 
 		oldvalue = sigma;
 		sigma += (sig0 - (a * sigma - helmertB(k1, sigma)) / k2) / sqrt(1.0l + usq * sqr(sinl(sigma)));
 	} while (fabsl(oldvalue - sigma) >= powl(2, -48));
-
-//	sigma += helmertB1(k1, sigma);
 	s2 = 2.0l * s1 + sigma;
 
 	*res = atan2_modified(su1 * cosl(sigma) + cu1 * sinl(sigma) * cosl(add->theta), (1 - FLAT) * hypotl(salp, su1 * sinl(sigma) - cu1 * cosl(sigma) * cosl(add->theta)));
